@@ -158,7 +158,7 @@ npm run preview    # Preview del build
 </td>
 <td>
 
-**Salarios** — Encuesta de Estructura Salarial 2023 (INE), ajustados con primas educativas INE y proxies internacionales (INSEE Francia, INE-PT Portugal). 121 valores unicos.
+**Salarios** — Encuesta de Estructura Salarial 2023 (INE), ajustados con primas educativas INE y proxies internacionales (INSEE Francia, INE-PT Portugal). 128 valores unicos.
 
 </td>
 </tr>
