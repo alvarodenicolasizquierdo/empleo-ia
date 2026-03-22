@@ -35,7 +35,14 @@ export function OccupationTooltip({ item, mousePos }: TooltipProps) {
             {item.name}
           </div>
         </div>
-        <ScoreBadge score={item.score} size="lg" />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+          <ScoreBadge score={item.score} size="lg" />
+          {item.rescoreCluster && (
+            <span style={{ fontSize: 8, color: "#a09b93", background: "rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}>
+              {t("tooltip.rescoredFrom", { cluster: item.rescoreCluster })}
+            </span>
+          )}
+        </div>
       </div>
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", padding: "10px", borderRadius: 8 }}>

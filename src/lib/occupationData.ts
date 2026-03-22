@@ -11,6 +11,14 @@ export interface RawOccupation {
   eu_ai_act: string;
   tipo_impacto: string;
   justificacion: string;
+  score_v9?: number;
+  rescore_method?: string;
+  rescore_cluster?: string;
+  rescore_D?: number;
+  rescore_C?: number;
+  rescore_F?: number;
+  rescore_R?: number;
+  rescore_formula?: string;
 }
 
 export interface Occupation {
@@ -28,6 +36,14 @@ export interface Occupation {
   salarioTotal?: number;
   scoreTotal?: number;
   items?: Occupation[];
+  // rescore sub-components
+  scoreV9?: number;
+  rescoreCluster?: string;
+  rescoreD?: number;
+  rescoreC?: number;
+  rescoreF?: number;
+  rescoreR?: number;
+  rescoreFormula?: string;
   // treemap layout
   x?: number;
   y?: number;
@@ -106,4 +122,13 @@ export const parseOccupation = (d: RawOccupation): Occupation => ({
   euRisk: mapEuRisk(d.eu_ai_act),
   tipo: mapTipo(d.tipo_impacto),
   vector: d.justificacion,
+  ...(d.rescore_D != null && {
+    scoreV9: d.score_v9,
+    rescoreCluster: d.rescore_cluster,
+    rescoreD: d.rescore_D,
+    rescoreC: d.rescore_C,
+    rescoreF: d.rescore_F,
+    rescoreR: d.rescore_R,
+    rescoreFormula: d.rescore_formula,
+  }),
 });

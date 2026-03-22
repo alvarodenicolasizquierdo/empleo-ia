@@ -266,6 +266,47 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
         </div>
 
+        {/* D/C/F/R sub-component breakdown */}
+        {selected.rescoreD != null && (() => {
+          const bars: { key: string; label: string; value: number; color: string; desc: string }[] = [
+            { key: "D", label: t("detail.displacementPotential"), value: selected.rescoreD!, color: "#b04232", desc: "↑ = more automatable" },
+            { key: "C", label: t("detail.complexity"), value: selected.rescoreC!, color: "#d4a85a", desc: "↑ = more complex" },
+            { key: "F", label: t("detail.feasibilityBarriers"), value: selected.rescoreF!, color: "#3a7d9e", desc: "↑ = harder to implement" },
+            { key: "R", label: t("detail.regulatoryProtection"), value: selected.rescoreR!, color: "#5494ab", desc: "↑ = more protected" },
+          ];
+          return (
+            <div style={{ marginBottom: 20, padding: 16, background: "#f0ece4", borderRadius: 8, border: "1px solid #e0dcd4" }}>
+              <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 12, fontWeight: 600 }}>
+                {t("detail.subComponents")}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {bars.map(b => (
+                  <div key={b.key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 14, fontSize: 12, fontWeight: 700, color: b.color, textAlign: "center", flexShrink: 0 }}>{b.key}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                        <span style={{ fontSize: 10, color: "#666" }}>{b.label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#1a1a1a", fontFamily: S }}>{b.value.toFixed(1)}</span>
+                      </div>
+                      <div style={{ height: 6, background: "#e0dcd4", borderRadius: 3, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${(b.value / 10) * 100}%`, background: b.color, borderRadius: 3, transition: "width 0.4s ease-out" }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                <span style={{ fontSize: 10, color: "#888" }}>
+                  {t("detail.rescoreFormula")}: <code style={{ fontSize: 10, background: "#e8e4dc", padding: "1px 5px", borderRadius: 3 }}>{selected.rescoreFormula}</code>
+                </span>
+                <span style={{ fontSize: 10, color: "#888", fontWeight: 600 }}>
+                  {t("detail.rescored", { from: selected.scoreV9?.toFixed(1), to: selected.score.toFixed(1) })}
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Automation vector */}
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 6 }}>{t("detail.automationVector")}</div>

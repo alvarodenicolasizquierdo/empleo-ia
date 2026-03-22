@@ -68,6 +68,13 @@
     "weightedIndex": "Weighted index, not wage bill at risk",
     "reliability": "Reliability:",
     "reliabilityText": "Score validated inter-model (55% coverage, 277/502 occupations). κ<sub>w</sub> = 0.667 (substantial agreement). MAD = 1.0 point.",
+    "subComponents": "Sub-component analysis",
+    "displacementPotential": "D — Displacement potential",
+    "complexity": "C — Task complexity",
+    "feasibilityBarriers": "F — Feasibility barriers",
+    "regulatoryProtection": "R — Regulatory protection",
+    "rescoreFormula": "Formula",
+    "rescored": "Rescored: {{from}} → {{to}}",
     "share": "SHARE",
     "copied": "Copied!",
     "copy": "Copy",
@@ -83,7 +90,8 @@
     "impactType": "Impact Type:",
     "wageIndex": "Wage bill × exposure index",
     "automVector": "Autom. Vector",
-    "clickToInspect": "Click to inspect {{count}} occupations in this sector"
+    "clickToInspect": "Click to inspect {{count}} occupations in this sector",
+    "rescoredFrom": "Rescored from {{cluster}}"
   },
   "sensitivity": {
     "title": "Sensitivity analysis: ±20% on calibration factors",

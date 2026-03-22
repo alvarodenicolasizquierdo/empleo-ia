@@ -68,6 +68,13 @@
     "weightedIndex": "Índice ponderado, no masa salarial en riesgo",
     "reliability": "Fiabilidad:",
     "reliabilityText": "Puntuación validada inter-modelo (55% cobertura, 277/502 ocupaciones). κ<sub>w</sub> = 0,667 (acuerdo sustancial). MAD = 1,0 punto.",
+    "subComponents": "Análisis sub-componentes",
+    "displacementPotential": "D — Potencial de desplazamiento",
+    "complexity": "C — Complejidad de tareas",
+    "feasibilityBarriers": "F — Barreras de viabilidad",
+    "regulatoryProtection": "R — Protección regulatoria",
+    "rescoreFormula": "Fórmula",
+    "rescored": "Rescored: {{from}} → {{to}}",
     "share": "COMPARTIR",
     "copied": "Copiado!",
     "copy": "Copiar",
@@ -83,7 +90,8 @@
     "impactType": "Tipo Impacto:",
     "wageIndex": "Índice masa salarial × exposición",
     "automVector": "Vector Autom.",
-    "clickToInspect": "Click para inspeccionar {{count}} ocupaciones en este sector"
+    "clickToInspect": "Click para inspeccionar {{count}} ocupaciones en este sector",
+    "rescoredFrom": "Rescored desde {{cluster}}"
   },
   "sensitivity": {
     "title": "Análisis de sensibilidad: ±20% en factores de calibración",
