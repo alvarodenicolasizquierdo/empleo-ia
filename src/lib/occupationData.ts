@@ -101,6 +101,12 @@ export const getEuLabel = (key: string): string =>
 export const getTipoLabel = (key: string): string =>
   i18n.t(`tipoLabels.${key}`);
 
+// Context-aware tipo label: sub-7 "replace" occupations use the hybrid label (Issue #25)
+export const getTipoLabelContextual = (tipo: string, score: number): string => {
+  if (tipo === "replace" && score < 7) return i18n.t("tipoLabels.replace_sub7");
+  return i18n.t(`tipoLabels.${tipo}`);
+};
+
 export const getScoreLabel = (s: number): string => {
   if (s <= 2) return i18n.t("scoreLabels.veryLow");
   if (s <= 4) return i18n.t("scoreLabels.low");

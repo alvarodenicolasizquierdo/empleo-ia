@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { type Occupation, type RawOccupation, parseOccupation, SCORE_COLORS, getScoreColor, getScoreLabel, fmt, fmtE, EU_LABELS, EU_COLORS, TIPO_LABELS } from "@/lib/occupationData";
+import { type Occupation, type RawOccupation, parseOccupation, SCORE_COLORS, getScoreColor, getScoreLabel, fmt, fmtE, EU_LABELS, EU_COLORS, TIPO_LABELS, getTipoLabelContextual } from "@/lib/occupationData";
 import { squarify } from "@/lib/treemap";
 import { ScoreBadge } from "@/components/empleo/Badge";
 import { OccupationTooltip } from "@/components/empleo/OccupationTooltip";
@@ -143,7 +143,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", fontFamily: S, letterSpacing: "-0.2px" }}>
-              {t("histogram.title", "Distribución de ocupaciones por nivel de exposición")}
+              {t("histogram.title")}
             </div>
             <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
               {filtered.length} {t("histogram.filtered", "ocupaciones filtradas")} · {t("histogram.scale", "Escala 0 (mínima) → 10 (máxima)")}
@@ -187,8 +187,8 @@ function Dashboard({ data }: { data: Occupation[] }) {
           })}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-          <span>← {t("histogram.low", "Baja exposición")}</span>
-          <span>{t("histogram.high", "Alta exposición")} →</span>
+          <span>{t("histogram.low")}</span>
+          <span>{t("histogram.high")}</span>
         </div>
       </div>
     );
@@ -242,6 +242,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
               {t("detail.exposure")} {getScoreLabel(selected.score)}
             </div>
             <div style={{ fontSize: 12, color: "#888" }}>{selected.score.toFixed(1)} / 10</div>
+            <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("detail.theoreticalCaveat")}</div>
           </div>
         </div>
 
@@ -262,7 +263,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
             <div style={{ fontSize: 20, fontWeight: 700, color: "#c8633a", fontFamily: S }}>
               {wage >= 1e9 ? (wage / 1e9).toFixed(1) + "B €" : (wage / 1e6).toFixed(0) + "M €"}
             </div>
-            <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{t("stats.wageFormula")}</div>
+            <div style={{ fontSize: 10, color: "#c8633a", marginTop: 2, fontWeight: 600 }}>{t("detail.wageSubtitle")}</div>
           </div>
         </div>
 
@@ -316,22 +317,65 @@ function Dashboard({ data }: { data: Occupation[] }) {
           }}>{selected.vector}</div>
         </div>
 
-        {/* Tags row */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
-          <span style={{
-            padding: "4px 12px", borderRadius: 16, fontSize: 11, fontWeight: 600,
-            background: `${EU_COLORS[selected.euRisk]}18`, color: EU_COLORS[selected.euRisk],
-            border: `1px solid ${EU_COLORS[selected.euRisk]}33`
-          }}>EU AI Act: {EU_LABELS[selected.euRisk]}</span>
+        {/* Impact type */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <span style={{
             padding: "4px 12px", borderRadius: 16, fontSize: 11, fontWeight: 600,
             background: "#f0ece4", color: "#666", border: "1px solid #e0dcd4"
-          }}>{TIPO_LABELS[selected.tipo]}</span>
-          <span style={{
-            marginLeft: "auto", fontSize: 10, color: "#888", lineHeight: 1.5, textAlign: "right",
-          }}>
-            {t("detail.reliability")} κ<sub>w</sub> = 0,667 · MAD = 1,0
-          </span>
+          }}>{getTipoLabelContextual(selected.tipo, selected.score)}</span>
+        </div>
+
+        {/* Contexto regulatorio (EU AI Act) — separate section */}
+        <div style={{ marginBottom: 16, padding: "10px 14px", background: `${EU_COLORS[selected.euRisk]}0d`, borderRadius: 6, border: `1px solid ${EU_COLORS[selected.euRisk]}22` }}>
+          <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 5, fontWeight: 600 }}>{t("detail.regulatoryContext")}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span style={{
+              padding: "3px 10px", borderRadius: 12, fontSize: 11, fontWeight: 600,
+              background: `${EU_COLORS[selected.euRisk]}18`, color: EU_COLORS[selected.euRisk],
+              border: `1px solid ${EU_COLORS[selected.euRisk]}33`
+            }}>EU AI Act: {EU_LABELS[selected.euRisk]}</span>
+          </div>
+          <div style={{ fontSize: 10, color: "#888", fontStyle: "italic" }}>{t("detail.regulatoryExplainer")}</div>
+        </div>
+
+        {/* Employment confidence */}
+        {selected.employmentConfidence && (
+          <div style={{ marginBottom: 16, padding: "10px 14px", background: "#f0ece4", borderRadius: 6 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 5, fontWeight: 600 }}>{t("detail.estimationQuality")}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{
+                padding: "3px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700,
+                background: selected.employmentConfidence === "A+" ? "#3a7d9e22" : selected.employmentConfidence === "A" ? "#5494ab22" : "#d4a85a22",
+                color: selected.employmentConfidence === "A+" ? "#2b6a8e" : selected.employmentConfidence === "A" ? "#3a7d9e" : "#b08050",
+                border: `1px solid ${selected.employmentConfidence === "A+" ? "#3a7d9e44" : selected.employmentConfidence === "A" ? "#5494ab44" : "#d4a85a44"}`,
+              }}>
+                {selected.employmentConfidence}
+              </span>
+              <span style={{ fontSize: 11, color: "#555" }}>
+                {selected.employmentConfidence === "A+" ? t("detail.confidenceAPlus") :
+                 selected.employmentConfidence === "A" ? t("detail.confidenceA") :
+                 t("detail.confidenceB")}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Interpretación rápida */}
+        <div style={{ marginBottom: 16, padding: "10px 14px", background: "#f9f6f0", borderRadius: 6, borderLeft: `3px solid ${getScoreColor(selected.score)}` }}>
+          <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 6, fontWeight: 600 }}>{t("detail.quickInterpretation")}</div>
+          <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6 }}>
+            {selected.name} {selected.score >= 7
+              ? (selected.tipo === "replace" ? "muestra alta vulnerabilidad por automatización de tareas centrales." : "presenta vulnerabilidad alta con potencial de aumentación significativo.")
+              : selected.score >= 5
+              ? "presenta vulnerabilidad moderada: algunas tareas son automatizables, otras requieren juicio humano."
+              : "tiene vulnerabilidad baja a la IA: predominan tareas físicas, relacionales o de alta complejidad no automatizable."}
+            {selected.flagDivergencia && <span style={{ display: "block", marginTop: 4, fontSize: 10, color: "#b08050" }}>⚠ Divergencia &gt;2 pts entre scoring holístico y sub-componentes — interpretar con cautela.</span>}
+          </div>
+        </div>
+
+        {/* Reliability */}
+        <div style={{ marginBottom: 16, padding: "8px 12px", background: "#f0ece4", borderRadius: 5, fontSize: 10, color: "#888", lineHeight: 1.5 }}>
+          <strong style={{ color: "#999" }}>{t("detail.reliability")}</strong> <span dangerouslySetInnerHTML={{ __html: t("detail.reliabilityText") }} />
         </div>
 
         {/* Social sharing */}
@@ -410,29 +454,70 @@ function Dashboard({ data }: { data: Occupation[] }) {
 
         {/* Stats ribbon */}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
-          {[
-            [t("stats.occupations"), filtered.length, t("stats.of", { total: OCCUPATIONS_DATA.length })],
-            [t("stats.employment"), fmt(stats.te), t("stats.workers", { count: (stats.te / 1e6).toFixed(1) })],
-            [t("stats.weightedExposure"), stats.ws.toFixed(1) + " / 10", getScoreLabel(stats.ws)],
-            [t("stats.highExposure"), `${stats.hp.toFixed(1)}%`, t("stats.jobs", { count: fmt(stats.he) })],
-            [t("stats.wageIndex"), `${(stats.tw / 1e9).toFixed(1)}B \u20AC`, t("stats.wageFormula")],
-
-          ].map(([l, v, s]) => (
-            <div key={l as string} style={{
-              padding: "12px 16px", background: "#f0ece4", borderRadius: 6,
-              flex: "1 1 150px", minWidth: 140
-            }}>
-              <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{l}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{v}</div>
-              {s && <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{s}</div>}
-            </div>
-          ))}
+          <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.occupations")}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{filtered.length}</div>
+            <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{t("stats.of", { total: OCCUPATIONS_DATA.length })}</div>
+          </div>
+          <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.employment")}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{t("stats.workers", { count: (stats.te / 1e6).toFixed(1) })}</div>
+            <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("stats.employmentMicro")}</div>
+          </div>
+          <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.weightedExposure")}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{stats.ws.toFixed(1)} / 10</div>
+            <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("stats.avgVulnMicro")}</div>
+          </div>
+          <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.highExposure")}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{stats.hp.toFixed(1)}%</div>
+            <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{t("stats.jobs", { count: fmt(stats.he) })}</div>
+            <div style={{ fontSize: 10, color: "#b08050", marginTop: 1, fontStyle: "italic" }}>{t("stats.highVulnMicro")}</div>
+          </div>
+          <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
+            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.wageIndex")}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{(stats.tw / 1e9).toFixed(1)}B €</div>
+            <div style={{ fontSize: 10, color: "#c8633a", marginTop: 2, fontWeight: 600 }}>{t("stats.wageSubtitle")}</div>
+          </div>
         </div>
 
         {/* Employment disclaimer */}
         <div style={{ fontSize: 10, color: "#b08050", background: "#fdf6ee", border: "1px solid #f0dcc0", borderRadius: 5, padding: "8px 12px", marginBottom: 20, lineHeight: 1.5 }}>
           <strong>{t("disclaimer.title")}</strong> {t("disclaimer.text")} <em>{t("disclaimer.italic")}</em>
         </div>
+
+        {/* Interpretation strip */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {([
+            ["theoretical", "#3a7d9e"],
+            ["employment", "#d4a85a"],
+            ["euAiAct", "#888"],
+          ] as const).map(([key, color]) => (
+            <div key={key} title={t(`interpretationStrip.${key}Tooltip`)} style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "5px 12px", borderRadius: 16, fontSize: 11, fontWeight: 600,
+              background: `${color}18`, color, border: `1px solid ${color}33`, cursor: "help",
+            }}>
+              <span style={{ fontSize: 13, lineHeight: 1 }}>ⓘ</span>
+              {t(`interpretationStrip.${key}`)}
+            </div>
+          ))}
+        </div>
+
+        {/* How to read accordion */}
+        <details style={{ marginBottom: 16 }}>
+          <summary style={{ fontSize: 11, fontWeight: 600, color: "#888", cursor: "pointer", userSelect: "none" }}>
+            {t("howToRead.title")} ▾
+          </summary>
+          <div style={{ marginTop: 10, padding: "12px 16px", background: "#f0ece4", borderRadius: 6, fontSize: 11, color: "#555", lineHeight: 1.7 }}>
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {(["p1","p2","p3","p4","p5","p6"] as const).map(k => (
+                <li key={k}>{t(`howToRead.${k}`)}</li>
+              ))}
+            </ul>
+          </div>
+        </details>
 
         {/* Compact Filters Bar */}
         <div style={{
@@ -881,6 +966,31 @@ function Dashboard({ data }: { data: Occupation[] }) {
         </details>
       </div>
 
+      {/* METHODOLOGY & LIMITATIONS PANEL */}
+      <div style={{ padding: "0 24px 16px", maxWidth: 1200, margin: "0 auto" }}>
+        <details style={{ marginBottom: 16 }}>
+          <summary style={{ fontSize: 12, fontWeight: 600, color: "#666", cursor: "pointer", marginBottom: 8 }}>
+            {t("methodologyPanel.title")}
+          </summary>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginTop: 12 }}>
+            {([
+              ["whatTitle", "whatText"],
+              ["whatNotTitle", "whatNotText"],
+              ["employmentTitle", "employmentText"],
+              ["salaryTitle", "salaryText"],
+              ["scoresTitle", "scoresText"],
+              ["euAiActTitle", "euAiActText"],
+              ["sourcesTitle", "sourcesText"],
+            ] as const).map(([titleKey, textKey]) => (
+              <div key={titleKey} style={{ padding: "12px 14px", background: "#f0ece4", borderRadius: 6 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#666", marginBottom: 4 }}>{t(`methodologyPanel.${titleKey}`)}</div>
+                <div style={{ fontSize: 10, color: "#888", lineHeight: 1.6 }}>{t(`methodologyPanel.${textKey}`)}</div>
+              </div>
+            ))}
+          </div>
+        </details>
+      </div>
+
       {/* FOOTER */}
       <div style={{ padding: "0 24px 28px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ fontSize: 10, color: "#bbb", lineHeight: 1.65 }}>
@@ -892,7 +1002,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <br />
           <strong style={{ color: "#999" }}>{t("methodology.internationalTitle")}</strong> {t("methodology.internationalText")}
           <br />
-          <strong style={{ color: "#999" }}>{t("methodology.llmTitle")}</strong> <span dangerouslySetInnerHTML={{ __html: t("methodology.llmText") }} /> <a href="https://doi.org/10.5281/zenodo.19076797" target="_blank" rel="noopener noreferrer" style={{ color: "#c8633a", textDecoration: "underline" }}>{t("methodology.fullMethodology")}</a>
+          <strong style={{ color: "#999" }}>{t("methodology.llmTitle")}</strong> <span dangerouslySetInnerHTML={{ __html: t("methodology.llmText") }} /> <a href="https://doi.org/10.5281/zenodo.19165098" target="_blank" rel="noopener noreferrer" style={{ color: "#c8633a", textDecoration: "underline" }}>{t("methodology.fullMethodology")}</a>
           <br />
           <strong style={{ color: "#999" }}>{t("methodology.noteTitle")}</strong> {t("methodology.noteText")}
         </div>

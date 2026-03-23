@@ -2,29 +2,33 @@
   "header": {
     "subtitle": "Labour vulnerability to AI · Spain 2026 · 502 CNO-11 occupations · LFS Q4 2025 · Census 2021",
     "title": "Job Vulnerability to Artificial Intelligence in Spain",
-    "description": "Analysis of 502 occupations in the Spanish labour market by their degree of AI exposure. Data INE/LFS Q4 2025 · Census 2021 weights · Scores calibrated with 5 Spain-specific structural factors (DESI 2023, labour protection, EU AI Act Annex III, AESIA)."
+    "description": "Analysis of 502 occupations in the Spanish labour market by their degree of AI vulnerability. Data INE/LFS Q4 2025 · Census 2021 weights · Scores calibrated with 5 Spain-specific structural factors (DESI 2023, labour protection, EU AI Act Annex III, AESIA)."
   },
   "stats": {
     "occupations": "Occupations",
     "of": "of {{total}}",
     "employment": "Employment",
     "workers": "{{count}}M workers",
-    "weightedExposure": "Weighted avg. exposure",
+    "employmentMicro": "Modelled occupational estimate, not directly observed at 4-digit level.",
+    "weightedExposure": "Weighted avg. vulnerability",
+    "avgVulnMicro": "Interpretive estimate, not a precise measurement.",
     "outOf10": "/ 10",
-    "highExposure": "High exposure ≥7",
+    "highExposure": "High vulnerability ≥7",
+    "highVulnMicro": "Indicative threshold; sensitivity band: 11.7%–15.2%.",
     "jobs": "{{count}} jobs",
-    "wageIndex": "Wage bill × exposure index",
+    "wageIndex": "Theoretical salary concentration index",
+    "wageSubtitle": "Theoretical indicator — not euros at risk",
     "wageFormula": "Employment × Salary × (Score/10)"
   },
   "disclaimer": {
     "title": "⚠ Note on employment data:",
-    "text": "The LFS only publishes employment at major group level (1-digit CNO). The 4-digit figures have been proportionally distributed within each 3-digit subgroup, weighted with INE Census 2021 data (145 subgroups). These are not individually observed occupation-level figures.",
-    "italic": "Proportional estimate — not observed at 4-digit level."
+    "text": "4-digit CNO figures are estimates (4-layer cascade: LFS 1-digit → LFS 2-digit → Census 3-digit → SEPE 4-digit). These are not individually observed occupation-level figures.",
+    "italic": "4-layer cascade estimate — not observed at 4-digit level."
   },
   "filters": {
     "searchPlaceholder": "Search occupation…",
     "allSectors": "All sectors",
-    "exposure": "Exp.",
+    "exposure": "Vuln.",
     "sortEmployment": "Employment",
     "sortSalary": "Salary",
     "sortRisk": "Risk"
@@ -43,12 +47,12 @@
   },
   "scatter": {
     "avgSalary": "Average Salary",
-    "iaExposure": "AI Exposure",
+    "iaExposure": "AI Vulnerability",
     "trend": "General trend",
     "bubbleNote": "Bubble size represents the occupation's share of total employment."
   },
   "list": {
-    "exposure": "Exposure",
+    "exposure": "Vulnerability",
     "employment": "Employment",
     "salary": "Salary",
     "score": "Score",
@@ -58,17 +62,43 @@
     "salaryCol": "Salary",
     "euAiAct": "EU AI Act"
   },
+  "interpretationStrip": {
+    "theoretical": "Theoretical vulnerability ≠ real displacement",
+    "theoreticalTooltip": "The score measures the theoretical automation potential of tasks, not the effective displacement of workers. Empirical evidence shows real adoption is 3-5× below theoretical exposure.",
+    "employment": "4-digit employment = estimate",
+    "employmentTooltip": "4-digit CNO employment figures are proportional estimates via LFS→Census→SEPE cascade, not directly observed per occupation.",
+    "euAiAct": "EU AI Act = regulatory context, not labour risk",
+    "euAiActTooltip": "The EU AI Act classification refers to AI system deployment in that professional context (Regulation 2024/1689, Annex III). It does not equate to labour displacement risk."
+  },
+  "howToRead": {
+    "title": "How to read this map",
+    "p1": "Each rectangle is an occupation (CNO-11 at 4-digit level). Colour indicates AI vulnerability level (blue = low, red = high). Size reflects employment volume.",
+    "p2": "Scores (0-10) are theoretical AI exposure estimates, calibrated with 5 Spain-specific structural factors. They are not displacement predictions.",
+    "p3": "The ≥7 threshold for 'high vulnerability' is indicative. Sensitivity band is 11.7%–15.2% under ±20% variations in calibration factors.",
+    "p4": "4-digit employment figures are estimates (4-layer cascade). 5 occupations in CNO group 59 (police, civil guard, prisons) use official administrative data.",
+    "p5": "EU AI Act classifies AI systems by use case (Annex III), not occupations. 'High risk' means AI systems in that context are subject to strict requirements, not that the job is at risk.",
+    "p6": "For labour policy or career decisions, consult the full methodology (56 technical notes) available on Zenodo."
+  },
   "detail": {
     "employees": "Employees",
     "avgSalary": "Average salary",
-    "exposure": "Exposure",
+    "exposure": "Vulnerability",
+    "theoreticalCaveat": "Theoretical vulnerability, not automatic displacement",
     "automationVector": "Automation vector",
-    "wageIndex": "Wage bill × exposure index",
+    "wageIndex": "Theoretical conc. index",
+    "wageSubtitle": "Theoretical indicator — not euros at risk",
     "formula": "Formula",
     "weightedIndex": "Weighted index, not wage bill at risk",
-    "reliability": "Reliability:",
-    "reliabilityText": "Score validated inter-model (55% coverage, 277/502 occupations). κ<sub>w</sub> = 0.667 (substantial agreement). MAD = 1.0 point.",
-    "subComponents": "Sub-component analysis",
+    "regulatoryContext": "Regulatory context",
+    "regulatoryExplainer": "Regulatory proxy for use-case context, not a legal ruling.",
+    "estimationQuality": "Employment estimation quality",
+    "confidenceAPlus": "A+ — Official administrative sources (highest confidence)",
+    "confidenceA": "A — Census 2021 + SEPE (good estimate)",
+    "confidenceB": "B — SEPE synthetic estimate (dependent on proportional weights)",
+    "quickInterpretation": "Quick interpretation",
+    "reliability": "Inter-model validation:",
+    "reliabilityText": "100% coverage (502/502 occupations). Rescaled: r = 0.953 (κ<sub>w</sub> = 0.667). Informative: r = 0.802. D/C/F/R available for all occupations.",
+    "subComponents": "D/C/F/R sub-component analysis",
     "displacementPotential": "D — Displacement potential",
     "complexity": "C — Task complexity",
     "feasibilityBarriers": "F — Feasibility barriers",
@@ -78,7 +108,7 @@
     "share": "SHARE",
     "copied": "Copied!",
     "copy": "Copy",
-    "shareText": "{{name}} (CNO {{cno}}) · AI Exposure: {{score}}/10 · {{employees}} employees · Average salary: {{salary}} · Wage bill × exposure index: {{index}} · Impact type: {{impact}} · EU AI Act: {{risk}}"
+    "shareText": "{{name}} (CNO {{cno}}) · AI Vulnerability: {{score}}/10 · {{employees}} employees · Average salary: {{salary}} · Theoretical concentration index: {{index}} · Impact type: {{impact}} · EU AI Act: {{risk}}"
   },
   "tooltip": {
     "sector": "Sector",
@@ -86,9 +116,9 @@
     "employees": "Employees",
     "avgSalary": "Average salary",
     "salary": "Salary",
-    "riskEuAiAct": "EU AI Act Risk:",
+    "riskEuAiAct": "EU AI Act (reg. context):",
     "impactType": "Impact Type:",
-    "wageIndex": "Wage bill × exposure index",
+    "wageIndex": "Theoretical conc. index",
     "automVector": "Autom. Vector",
     "clickToInspect": "Click to inspect {{count}} occupations in this sector",
     "rescoredFrom": "Rescored from {{cluster}}"
@@ -97,41 +127,58 @@
     "title": "Sensitivity analysis: ±20% on calibration factors",
     "description": "The 5 calibration factors are expert judgement without empirical back-testing. This table shows how key figures change when each factor is shifted ±20%. The multiplicative formula compounds the uncertainty.",
     "scenario": "Scenario",
-    "avgExposure": "Avg. exposure",
-    "highExp": "High exp. (≥7)",
-    "wageIndex": "Wage bill index",
+    "avgExposure": "Avg. vulnerability",
+    "highExp": "High vuln. (≥7)",
+    "wageIndex": "Conc. index",
     "baseCal": "Current calibration (baseline)",
-    "allMinus": "All factors −20% (higher exposure)",
-    "allPlus": "All factors +20% (lower exposure)",
-    "note": "Note: \"High exposure\" figures are not linearly recalculated because they depend on individual thresholds per occupation. The wage bill × exposure index scales proportionally."
+    "allMinus": "All factors −20% (higher vulnerability)",
+    "allPlus": "All factors +20% (lower vulnerability)",
+    "note": "Note: \"High vulnerability\" figures are not linearly recalculated because they depend on individual thresholds per occupation. The salary concentration index scales proportionally."
   },
   "methodology": {
     "title": "Methodology:",
-    "text1": "502 CNO-11 occupations (INE/SEPE). Employment: LFS Q4 2025 microdata (22.46M employed), distributed using structural weights from the 2021 Population Census (INE, administrative records, 145 subgroups at 3-digit CNO).",
+    "text1": "502 CNO-11 occupations (INE/SEPE). Employment: LFS Q4 2025 microdata (22.73M employed), distributed via 4-layer cascade (LFS 1-digit → LFS 2-digit → Census 2021 → SEPE 4-digit). 5 occupations in CNO group 59 use official administrative data (MIR Yearbook, AAPP Bulletin, INAP, Prison Academy).",
     "text2": "Salaries: Wage Structure Survey 2023 (INE), adjusted with INE education premia and international proxies (INSEE France, INE-PT Portugal). 128 unique values.",
-    "text3": "AI exposure scores (0-10) calibrated with 5 Spain-specific structural factors: (1) DESI 2023 digitalisation index by sector (69.8 aggregate points, 3rd EU — EC no longer publishes composite DESI post-2023), (2) services sector weight, (3) labour protection (Workers' Statute), (4) AI use-case classification per EU AI Act (Regulation 2024/1689, Annex III — classifies AI systems by use case, not occupations), (5) AESIA supervision (Royal Decree 729/2023).",
-    "wageIndexTitle": "Wage bill × exposure index:",
-    "wageIndexText": "Calculated as Employment × Salary × (Score/10). A weighted index reflecting the concentration of wage bill in high-exposure occupations. It does <em>not</em> represent wage bill \"at risk\" or \"threatened\" — a high score indicates theoretical exposure, not displacement.",
+    "text3": "AI vulnerability scores (0-10) calibrated with 5 Spain-specific structural factors: (1) DESI 2023 digitalisation index by sector (69.8 aggregate points, 3rd EU — EC no longer publishes composite DESI post-2023), (2) services sector weight, (3) labour protection (Workers' Statute), (4) AI use-case classification per EU AI Act (Regulation 2024/1689, Annex III — classifies AI systems by use case, not occupations), (5) AESIA supervision (Royal Decree 729/2023).",
+    "wageIndexTitle": "Theoretical salary concentration index:",
+    "wageIndexText": "Calculated as Employment × Salary × (Score/10). A weighted index reflecting the concentration of wage bill in high-vulnerability occupations. It does <em>not</em> represent wage bill \"at risk\" or \"threatened\" — a high score indicates theoretical vulnerability, not displacement.",
     "employmentTitle": "Employment data:",
-    "employmentText": "4-digit CNO figures are proportional estimates (LFS→1-digit, redistributed with Census 2021 weights to 3 digits). These are not individually observed figures. The LFS includes ~3.3M self-employed; the Wage Structure Survey excludes them by design.",
+    "employmentText": "4-digit CNO figures are estimates (4-layer cascade: LFS 1-digit → LFS 2-digit with 62 subgroups → Census 3-digit → SEPE 4-digit). 499 unique values. 5 occupations (CNO 5910, 5921, 5922, 5923, 5991) use official administrative data (A+/A confidence). The LFS includes ~3.3M self-employed; the Wage Structure Survey excludes them by design.",
     "internationalTitle": "International comparison:",
-    "internationalText": "The OECD estimates 28% of jobs at risk of automation in Spain, but that figure includes all technologies (robotics, traditional software, AI). The OECD AI-specific figure for Spain is 5.9% high risk (traditional automation) or 27.4% exposure to generative AI (different construct). Our 20.2% measures theoretical AI exposure calibrated with Spain-specific structural factors.",
+    "internationalText": "The OECD estimates 28% of jobs at risk of automation in Spain, but that figure includes all technologies (robotics, traditional software, AI). The OECD AI-specific figure for Spain is 5.9% high risk (traditional automation) or 27.4% exposure to generative AI (different construct). Our 12.1% measures theoretical AI vulnerability calibrated with Spain-specific structural factors (47 occupations, 22.73M workers).",
     "llmTitle": "LLM scoring and inter-model validation:",
-    "llmText": "Scores were generated with Gemini 2.5 Pro (T=0.2, structured prompts) and validated through blind re-scoring of 100 stratified occupations by GPT-4o, plus sub-component re-scoring (GPT 5.4 + Gemini 3) of 177 additional occupations (7.0 and 5.0 clusters). Inter-model validation coverage: 55% (277/502). Holistic results: r = 0.715 (good), ICC(2,1) = 0.701 (good), κ<sub>w</sub> = 0.667 (substantial agreement, Landis-Koch). 84% of occupations agree within ±2.0 points. 5.0 re-scoring: 90% agreement within ±1.0, median diff 0.42.",
-    "fullMethodology": "Full methodology (44 technical notes) →",
+    "llmText": "Scores generated with Gemini 2.5 Pro (T=0.2) and validated with GPT-4o (100 holistic) + GPT 5.4 and Gemini 3 (D/C/F/R sub-components). 100% coverage (502/502 occupations): 100 rescaled (r = 0.953) + 402 informative (r = 0.802). κ<sub>w</sub> = 0.667 (substantial agreement, Landis-Koch). 158 occupations with divergence >2.0 points documented in notes [21] and [47]. Prompts, scripts and raw data published on Zenodo (DOI 10.5281/zenodo.19165098).",
+    "fullMethodology": "Full methodology (56 technical notes) →",
     "noteTitle": "Note:",
-    "noteText": "Scores are theoretical exposure estimates, not predictions of job displacement. Empirical evidence (Anthropic, February 2026) shows that theoretical exposure can differ significantly from actual adoption (94% theoretical vs 33% observed in computing/mathematical occupations). Full methodology with 44 technical notes available in PDF."
+    "noteText": "Scores are theoretical vulnerability estimates, not predictions of job displacement. Empirical evidence (Anthropic, February 2026) shows theoretical vulnerability can differ significantly from actual adoption (94% theoretical vs 33% observed in computing/mathematical occupations). Apply a 70-80% discount to estimate current impact. Full methodology with 56 technical notes available on Zenodo."
+  },
+  "methodologyPanel": {
+    "title": "Methodology & limitations",
+    "whatTitle": "What does it measure?",
+    "whatText": "Theoretical AI automation vulnerability (0-10) for 502 CNO-11 occupations. Measures task automation potential, not effective worker displacement.",
+    "whatNotTitle": "What does it NOT measure?",
+    "whatNotText": "Does not measure: (1) actual probability of job loss, (2) adoption speed, (3) net impact (destruction minus creation), (4) retraining effects, (5) inequalities by age/gender/region.",
+    "employmentTitle": "Employment data",
+    "employmentText": "4-layer cascade estimate. 499 unique values. 5 public security occupations use official administrative data. Estimated margin of error ±15% for Tier B occupations.",
+    "salaryTitle": "Salaries",
+    "salaryText": "WSS 2023 (INE). 128 unique values (INE publishes at 2-digit CNO). Validated MAPE: 4.96%. Temporal deflator not applied (CPI +10% 2022→2025) to maintain MAPE validation coherence.",
+    "scoresTitle": "Vulnerability scores",
+    "scoresText": "Generated with LLMs, 100% inter-model validated. 158 occupations with divergence >2 points between holistic and sub-component scoring — documented in notes [21] and [47].",
+    "euAiActTitle": "EU AI Act in this context",
+    "euAiActText": "The EU AI Act classification (Regulation 2024/1689, Annex III) classifies AI systems by use case, not occupations. 'High risk' means AI system deployment in that context requires strict compliance. It does not equate to labour risk or automation probability.",
+    "sourcesTitle": "Sources",
+    "sourcesText": "INE/LFS Q4 2025, Census 2021, SEPE contracts 2024, WSS 2023, MIR Yearbook 2023, AAPP Bulletin 2024, INAP, Prison Academy/SGIP. Prompts, scripts and raw data: Zenodo DOI 10.5281/zenodo.19165098."
   },
   "footer": {
-    "credit": "Methodology V23 · Inter-model validation: κw = 0.667 · © 2026 A. de Nicolás, M. Sureda"
+    "credit": "Methodology v29a · 56 technical notes · Inter-model validation: κw = 0.667 · © 2026 A. de Nicolás, M. Sureda"
   },
   "histogram": {
-    "title": "Occupation distribution by exposure level",
+    "title": "Occupation distribution by vulnerability level",
     "filtered": "occupations filtered",
     "scale": "Scale 0 (minimum) → 10 (maximum)",
-    "methodologyPdf": "Methodology V23 (PDF)",
-    "low": "Low exposure",
-    "high": "High exposure"
+    "methodologyPdf": "Zenodo V28 (DOI)",
+    "low": "← Low vulnerability",
+    "high": "High vulnerability →"
   },
   "loading": "Loading data...",
   "error": "Error",
@@ -148,7 +195,8 @@
     "minimal": "Minimal risk"
   },
   "tipoLabels": {
-    "replace": "Substitution",
+    "replace": "Partial task substitution",
+    "replace_sub7": "Hybrid (automation pressure)",
     "hybrid": "Hybrid",
     "augment": "Augmentation"
   },

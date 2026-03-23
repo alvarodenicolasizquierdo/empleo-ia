@@ -2,29 +2,33 @@
   "header": {
     "subtitle": "Vulnerabilidad laboral a la IA · España 2026 · 502 ocupaciones CNO-11 · EPA Q4 2025 · Censo 2021",
     "title": "Vulnerabilidad de Empleos a la Inteligencia Artificial en España",
-    "description": "Análisis de las 502 ocupaciones del mercado laboral español según su grado de exposición a la IA. Datos INE/EPA Q4 2025 · Ponderaciones Censo 2021 · Puntuaciones calibradas con 5 factores estructurales España (DESI 2023, protección laboral, EU AI Act Anexo III, AESIA)."
+    "description": "Análisis de las 502 ocupaciones del mercado laboral español según su grado de vulnerabilidad a la IA. Datos INE/EPA Q4 2025 · Ponderaciones Censo 2021 · Puntuaciones calibradas con 5 factores estructurales España (DESI 2023, protección laboral, EU AI Act Anexo III, AESIA)."
   },
   "stats": {
     "occupations": "Ocupaciones",
     "of": "de {{total}}",
     "employment": "Empleos",
     "workers": "{{count}}M trabajadores",
-    "weightedExposure": "Exposición media ponderada",
+    "employmentMicro": "Estimación ocupacional modelizada, no dato observado a 4 dígitos.",
+    "weightedExposure": "Vulnerabilidad media ponderada",
+    "avgVulnMicro": "Estimación interpretativa, no medición exacta.",
     "outOf10": "/ 10",
-    "highExposure": "Alta exposición ≥7",
+    "highExposure": "Alta vulnerabilidad ≥7",
+    "highVulnMicro": "Umbral orientativo; banda de sensibilidad: 11,7%–15,2%.",
     "jobs": "{{count}} empleos",
-    "wageIndex": "Índice masa salarial × exposición",
+    "wageIndex": "Índice teórico de concentración salarial",
+    "wageSubtitle": "Indicador teórico — no euros en riesgo",
     "wageFormula": "Empleo × Salario × (Score/10)"
   },
   "disclaimer": {
     "title": "⚠ Nota sobre datos de empleo:",
-    "text": "La EPA solo publica empleo a nivel de gran grupo (1 dígito CNO). Las cifras a 4 dígitos se han distribuido proporcionalmente dentro de cada subgrupo a 3 dígitos, ponderadas con datos del Censo 2021 del INE (145 subgrupos). No son datos observados por ocupación individual.",
-    "italic": "Estimación proporcional — no dato observado a 4 dígitos."
+    "text": "Las cifras a 4 dígitos CNO son estimaciones (cascada 4 capas: EPA 1-dígito → EPA 2-dígito → Censo 3-dígito → SEPE 4-dígito). No son datos observados por ocupación individual.",
+    "italic": "Estimación cascada 4 capas — no dato observado a 4 dígitos."
   },
   "filters": {
     "searchPlaceholder": "Buscar ocupación…",
     "allSectors": "Todos los sectores",
-    "exposure": "Exp.",
+    "exposure": "Vuln.",
     "sortEmployment": "Empleo",
     "sortSalary": "Salario",
     "sortRisk": "Riesgo"
@@ -43,12 +47,12 @@
   },
   "scatter": {
     "avgSalary": "Salario Medio",
-    "iaExposure": "Exposición IA",
+    "iaExposure": "Vulnerabilidad IA",
     "trend": "Tendencia general",
     "bubbleNote": "El tamaño de la burbuja representa el volumen de empleo de la ocupación respecto al total."
   },
   "list": {
-    "exposure": "Exposición",
+    "exposure": "Vulnerabilidad",
     "employment": "Empleo",
     "salary": "Salario",
     "score": "Score",
@@ -58,17 +62,43 @@
     "salaryCol": "Salario",
     "euAiAct": "EU AI Act"
   },
+  "interpretationStrip": {
+    "theoretical": "Vulnerabilidad teórica ≠ desplazamiento real",
+    "theoreticalTooltip": "La puntuación mide el potencial teórico de automatización de tareas, no el desplazamiento efectivo de trabajadores. La evidencia empírica muestra que la adopción real es 3-5× inferior a la exposición teórica.",
+    "employment": "Empleo 4 dígitos = estimación",
+    "employmentTooltip": "Las cifras de empleo a 4 dígitos CNO son estimaciones proporcionales mediante cascada EPA→Censo→SEPE, no datos observados directamente por ocupación.",
+    "euAiAct": "EU AI Act = contexto regulatorio, no riesgo laboral",
+    "euAiActTooltip": "La clasificación EU AI Act se refiere al tipo de uso de sistemas de IA en ese contexto profesional (Reglamento 2024/1689, Anexo III). No equivale a riesgo de desplazamiento laboral."
+  },
+  "howToRead": {
+    "title": "Cómo leer este mapa",
+    "p1": "Cada rectángulo es una ocupación (CNO-11 a 4 dígitos). El color indica el nivel de vulnerabilidad IA (azul = baja, rojo = alta). El tamaño refleja el volumen de empleo.",
+    "p2": "Las puntuaciones (0-10) son estimaciones teóricas de exposición a la IA, calibradas con 5 factores estructurales de España. No son predicciones de desplazamiento.",
+    "p3": "El umbral ≥7 para 'alta vulnerabilidad' es orientativo. La banda de sensibilidad es 11,7%–15,2% según variaciones de ±20% en los factores de calibración.",
+    "p4": "Los datos de empleo a 4 dígitos son estimaciones (cascada 4 capas). Los 5 ocupaciones del grupo CNO 59 (policías, guardias civiles, prisiones) usan datos administrativos oficiales.",
+    "p5": "EU AI Act clasifica sistemas de IA por caso de uso (Anexo III), no ocupaciones. 'Alto riesgo' indica que sistemas de IA en ese contexto están sujetos a requisitos estrictos, no que el trabajo esté en riesgo.",
+    "p6": "Para tomar decisiones laborales o de política pública, consulte la metodología completa (56 notas técnicas) disponible en Zenodo."
+  },
   "detail": {
     "employees": "Empleados",
     "avgSalary": "Salario medio",
-    "exposure": "Exposición",
+    "exposure": "Vulnerabilidad",
+    "theoreticalCaveat": "Vulnerabilidad teórica, no desplazamiento automático",
     "automationVector": "Vector de automatización",
-    "wageIndex": "Índice masa salarial × exposición",
+    "wageIndex": "Índice teórico conc. salarial",
+    "wageSubtitle": "Indicador teórico — no euros en riesgo",
     "formula": "Fórmula",
     "weightedIndex": "Índice ponderado, no masa salarial en riesgo",
-    "reliability": "Fiabilidad:",
-    "reliabilityText": "Puntuación validada inter-modelo (55% cobertura, 277/502 ocupaciones). κ<sub>w</sub> = 0,667 (acuerdo sustancial). MAD = 1,0 punto.",
-    "subComponents": "Análisis sub-componentes",
+    "regulatoryContext": "Contexto regulatorio",
+    "regulatoryExplainer": "Proxy regulatorio de contexto de uso, no dictamen legal.",
+    "estimationQuality": "Calidad de la estimación de empleo",
+    "confidenceAPlus": "A+ — Fuentes administrativas oficiales (máxima confianza)",
+    "confidenceA": "A — Censo 2021 + SEPE (buena estimación)",
+    "confidenceB": "B — Estimación sintética SEPE (dependiente de pesos proporcionales)",
+    "quickInterpretation": "Interpretación rápida",
+    "reliability": "Validación inter-modelo:",
+    "reliabilityText": "100% cobertura (502/502 ocupaciones). Rescalados: r = 0,953 (κ<sub>w</sub> = 0,667). Informativos: r = 0,802. D/C/F/R disponible para todas las ocupaciones.",
+    "subComponents": "Análisis sub-componentes D/C/F/R",
     "displacementPotential": "D — Potencial de desplazamiento",
     "complexity": "C — Complejidad de tareas",
     "feasibilityBarriers": "F — Barreras de viabilidad",
@@ -78,7 +108,7 @@
     "share": "COMPARTIR",
     "copied": "Copiado!",
     "copy": "Copiar",
-    "shareText": "{{name}} (CNO {{cno}}) · Exposición IA: {{score}}/10 · {{employees}} empleados · Salario medio: {{salary}} · Índice masa salarial × exposición: {{index}} · Tipo impacto: {{impact}} · EU AI Act: {{risk}}"
+    "shareText": "{{name}} (CNO {{cno}}) · Vulnerabilidad IA: {{score}}/10 · {{employees}} empleados · Salario medio: {{salary}} · Índice conc. salarial: {{index}} · Tipo impacto: {{impact}} · EU AI Act: {{risk}}"
   },
   "tooltip": {
     "sector": "Sector",
@@ -86,9 +116,9 @@
     "employees": "Empleados",
     "avgSalary": "Salario medio",
     "salary": "Salario",
-    "riskEuAiAct": "Riesgo EU AI Act:",
+    "riskEuAiAct": "EU AI Act (contexto reg.):",
     "impactType": "Tipo Impacto:",
-    "wageIndex": "Índice masa salarial × exposición",
+    "wageIndex": "Índice teórico conc. salarial",
     "automVector": "Vector Autom.",
     "clickToInspect": "Click para inspeccionar {{count}} ocupaciones en este sector",
     "rescoredFrom": "Rescored desde {{cluster}}"
@@ -97,50 +127,67 @@
     "title": "Análisis de sensibilidad: ±20% en factores de calibración",
     "description": "Los 5 factores de calibración son juicio experto sin back-test empírico. Esta tabla muestra cómo varían las cifras principales al mover cada factor ±20%. La fórmula multiplicativa compone la incertidumbre.",
     "scenario": "Escenario",
-    "avgExposure": "Exposición media",
-    "highExp": "Alta exp. (≥7)",
-    "wageIndex": "Índice masa sal.",
+    "avgExposure": "Vulnerabilidad media",
+    "highExp": "Alta vuln. (≥7)",
+    "wageIndex": "Índice conc. sal.",
     "baseCal": "Calibración actual (base)",
-    "allMinus": "Todos los factores −20% (más exposición)",
-    "allPlus": "Todos los factores +20% (menos exposición)",
-    "note": "Nota: Las cifras de \"Alta exposición\" no se recalculan linealmente porque dependen de umbrales individuales por ocupación. El índice de masa salarial × exposición escala proporcionalmente."
+    "allMinus": "Todos los factores −20% (más vulnerabilidad)",
+    "allPlus": "Todos los factores +20% (menos vulnerabilidad)",
+    "note": "Nota: Las cifras de \"Alta vulnerabilidad\" no se recalculan linealmente porque dependen de umbrales individuales por ocupación. El índice de concentración salarial escala proporcionalmente."
   },
   "methodology": {
     "title": "Metodología:",
-    "text1": "502 ocupaciones CNO-11 (INE/SEPE). Empleo: EPA Q4 2025 microdatos (22,46M ocupados), distribuido mediante ponderaciones estructurales del Censo de Población 2021 (INE, registros administrativos, 145 subgrupos a 3 dígitos CNO).",
+    "text1": "502 ocupaciones CNO-11 (INE/SEPE). Empleo: EPA Q4 2025 microdatos (22,73M ocupados), distribuido mediante cascada 4 capas (EPA 1-dígito → EPA 2-dígito → Censo 2021 → SEPE 4-dígito). 5 ocupaciones CNO grupo 59 con datos administrativos oficiales (Anuario MIR, Boletín AAPP, INAP, Academia de Prisiones).",
     "text2": "Salarios: Encuesta de Estructura Salarial 2023 (INE), ajustados con primas educativas INE y proxies internacionales (INSEE Francia, INE-PT Portugal). 128 valores únicos.",
-    "text3": "Puntuaciones de exposición IA (0-10) calibradas con 5 factores estructurales España: (1) índice de digitalización DESI 2023 por sector (69,8 puntos agregado, 3.º UE — la CE ya no publica DESI compuesto post-2023), (2) peso del sector servicios, (3) protección laboral (Estatuto de los Trabajadores), (4) clasificación de contextos de uso de IA según EU AI Act (Reglamento 2024/1689, Anexo III — clasifica sistemas de IA por caso de uso, no ocupaciones), (5) supervisión AESIA (Real Decreto 729/2023).",
-    "wageIndexTitle": "Índice masa salarial × exposición:",
-    "wageIndexText": "Se calcula como Empleo × Salario × (Score/10). Es un índice ponderado que refleja la concentración de masa salarial en ocupaciones con alta exposición. <em>No</em> representa la masa salarial \"en riesgo\" ni \"amenazada\" — una puntuación alta indica exposición teórica, no desplazamiento.",
+    "text3": "Puntuaciones de vulnerabilidad IA (0-10) calibradas con 5 factores estructurales España: (1) índice de digitalización DESI 2023 por sector (69,8 puntos agregado, 3.º UE — la CE ya no publica DESI compuesto post-2023), (2) peso del sector servicios, (3) protección laboral (Estatuto de los Trabajadores), (4) clasificación de contextos de uso de IA según EU AI Act (Reglamento 2024/1689, Anexo III — clasifica sistemas de IA por caso de uso, no ocupaciones), (5) supervisión AESIA (Real Decreto 729/2023).",
+    "wageIndexTitle": "Índice teórico de concentración salarial:",
+    "wageIndexText": "Se calcula como Empleo × Salario × (Score/10). Es un índice ponderado que refleja la concentración de masa salarial en ocupaciones con alta vulnerabilidad. <em>No</em> representa la masa salarial \"en riesgo\" ni \"amenazada\" — una puntuación alta indica vulnerabilidad teórica, no desplazamiento.",
     "employmentTitle": "Datos de empleo:",
-    "employmentText": "Las cifras a 4 dígitos CNO son estimaciones proporcionales (EPA→1 dígito, redistribuido con ponderaciones Censo 2021 a 3 dígitos). No son datos observados por ocupación individual. La EPA incluye ~3,3M de autónomos; la EES salarial los excluye por diseño.",
+    "employmentText": "Las cifras a 4 dígitos CNO son estimaciones (cascada 4 capas: EPA 1-dígito → EPA 2-dígito con 62 subgrupos → Censo 3-dígito → SEPE 4-dígito). 499 valores únicos. 5 ocupaciones (CNO 5910, 5921, 5922, 5923, 5991) con datos administrativos oficiales (confianza A+/A). La EPA incluye ~3,3M de autónomos; la EES salarial los excluye por diseño.",
     "internationalTitle": "Comparativa internacional:",
-    "internationalText": "La OCDE estima un 28% de empleos en riesgo de automatización en España, pero esa cifra incluye todas las tecnologías (robótica, software tradicional, IA). La cifra OCDE específica de IA para España es un 5,9% de alto riesgo (automatización tradicional) o 27,4% de exposición a IA generativa (constructo diferente). Nuestro 20,2% mide exposición teórica a IA calibrada con factores estructurales España.",
+    "internationalText": "La OCDE estima un 28% de empleos en riesgo de automatización en España, pero esa cifra incluye todas las tecnologías (robótica, software tradicional, IA). La cifra OCDE específica de IA para España es un 5,9% de alto riesgo (automatización tradicional) o 27,4% de exposición a IA generativa (constructo diferente). Nuestro 12,1% mide vulnerabilidad teórica a IA calibrada con factores estructurales España (47 ocupaciones, 22,73M empleados).",
     "llmTitle": "Puntuación LLM y validación inter-modelo:",
-    "llmText": "Las puntuaciones se generaron con Gemini 2.5 Pro (T=0,2, prompts estructurados) y se validaron mediante re-puntuación ciega de 100 ocupaciones estratificadas por GPT-4o, más re-scoring por sub-componentes (GPT 5.4 + Gemini 3) de 177 ocupaciones adicionales (clusters 7.0 y 5.0). Cobertura de validación inter-modelo: 55% (277/502). Resultados holísticos: r = 0,715 (buena), ICC(2,1) = 0,701 (buena), κ<sub>w</sub> = 0,667 (acuerdo sustancial, Landis-Koch). El 84% de las ocupaciones coinciden dentro de ±2,0 puntos. Re-scoring 5.0: acuerdo 90% dentro de ±1,0, mediana diff 0,42.",
-    "fullMethodology": "Metodología completa (44 notas técnicas) →",
+    "llmText": "Puntuaciones generadas con Gemini 2.5 Pro (T=0,2) y validadas con GPT-4o (100 holísticas) + GPT 5.4 y Gemini 3 (sub-componentes D/C/F/R). Cobertura 100% (502/502 ocupaciones): 100 rescaladas (r = 0,953) + 402 informativas (r = 0,802). κ<sub>w</sub> = 0,667 (acuerdo sustancial, Landis-Koch). 158 ocupaciones con divergencia >2,0 puntos (97% en dirección fórmula < holístico) documentadas. Prompts, scripts y datos brutos publicados en Zenodo (DOI 10.5281/zenodo.19165098).",
+    "fullMethodology": "Metodología completa (56 notas técnicas) →",
     "noteTitle": "Nota:",
-    "noteText": "Las puntuaciones son estimaciones de exposición teórica, no predicciones de desplazamiento laboral. La evidencia empírica (Anthropic, febrero 2026) muestra que la exposición teórica puede diferir significativamente de la adopción real (94% teórico vs 33% observado en ocupaciones informáticas/matemáticas). Metodología completa con 44 notas técnicas disponible en PDF."
+    "noteText": "Las puntuaciones son estimaciones de vulnerabilidad teórica, no predicciones de desplazamiento laboral. La evidencia empírica (Anthropic, febrero 2026) muestra que la vulnerabilidad teórica puede diferir significativamente de la adopción real (94% teórico vs 33% observado en ocupaciones informáticas/matemáticas). Aplicar un descuento del 70-80% para estimar el impacto actual. Metodología completa con 56 notas técnicas disponible en Zenodo."
+  },
+  "methodologyPanel": {
+    "title": "Metodología y limitaciones",
+    "whatTitle": "¿Qué mide?",
+    "whatText": "Vulnerabilidad teórica a la automatización por IA (0-10) de 502 ocupaciones del CNO-11. Mide el potencial de automatización de tareas, no el desplazamiento efectivo de trabajadores.",
+    "whatNotTitle": "¿Qué NO mide?",
+    "whatNotText": "No mide: (1) probabilidad real de pérdida de empleo, (2) velocidad de adopción, (3) impacto neto (destrucción menos creación), (4) efectos de recualificación, (5) desigualdades por edad/género/región.",
+    "employmentTitle": "Datos de empleo",
+    "employmentText": "Estimación cascada 4 capas. 499 valores únicos. 5 ocupaciones de seguridad pública con datos administrativos oficiales. Margen de error estimado ±15% en ocupaciones Tier B.",
+    "salaryTitle": "Salarios",
+    "salaryText": "EES 2023 (INE). 128 valores únicos (INE publica a 2 dígitos CNO). MAPE validado: 4,96%. Deflactor temporal no aplicado (CPI +10% 2022→2025) para mantener coherencia con validación MAPE.",
+    "scoresTitle": "Puntuaciones de vulnerabilidad",
+    "scoresText": "Generadas con LLMs, validadas inter-modelo al 100%. 158 ocupaciones con divergencia >2 puntos entre scoring holístico y por sub-componentes — documentado en notas [21] y [47].",
+    "euAiActTitle": "EU AI Act en este contexto",
+    "euAiActText": "La clasificación EU AI Act (Reglamento 2024/1689, Anexo III) clasifica sistemas de IA por caso de uso, no ocupaciones. 'Alto riesgo' indica que el despliegue de sistemas de IA en ese contexto requiere cumplimiento estricto. No equivale a riesgo laboral ni a probabilidad de automatización.",
+    "sourcesTitle": "Fuentes",
+    "sourcesText": "INE/EPA Q4 2025, Censo 2021, SEPE contratos 2024, EES 2023, Anuario MIR 2023, Boletín AAPP 2024, INAP, Academia de Prisiones/SGIP. Prompts, scripts y datos brutos: Zenodo DOI 10.5281/zenodo.19165098."
   },
   "footer": {
-    "credit": "Metodología V23 · Validación inter-modelo: κw = 0,667 · © 2026 A. de Nicolás, M. Sureda"
+    "credit": "Metodología v29a · 56 notas técnicas · Validación inter-modelo: κw = 0,667 · © 2026 A. de Nicolás, M. Sureda"
   },
   "histogram": {
-    "title": "Distribución de ocupaciones por nivel de exposición",
+    "title": "Distribución de ocupaciones por nivel de vulnerabilidad",
     "filtered": "ocupaciones filtradas",
     "scale": "Escala 0 (mínima) → 10 (máxima)",
-    "methodologyPdf": "Metodología V23 (PDF)",
-    "low": "Baja exposición",
-    "high": "Alta exposición"
+    "methodologyPdf": "Zenodo V28 (DOI)",
+    "low": "← Baja vulnerabilidad",
+    "high": "Alta vulnerabilidad →"
   },
   "loading": "Cargando datos...",
   "error": "Error",
   "scoreLabels": {
-    "veryLow": "Muy bajo",
-    "low": "Bajo",
-    "moderate": "Moderado",
-    "high": "Alto",
-    "veryHigh": "Muy alto"
+    "veryLow": "Muy baja",
+    "low": "Baja",
+    "moderate": "Moderada",
+    "high": "Alta",
+    "veryHigh": "Muy alta"
   },
   "euLabels": {
     "high-risk": "Alto riesgo (Anexo III)",
@@ -148,7 +195,8 @@
     "minimal": "Riesgo mínimo"
   },
   "tipoLabels": {
-    "replace": "Sustitución",
+    "replace": "Sustitución parcial de tareas",
+    "replace_sub7": "Híbrido (presión de automatización)",
     "hybrid": "Híbrido",
     "augment": "Aumentación"
   },
