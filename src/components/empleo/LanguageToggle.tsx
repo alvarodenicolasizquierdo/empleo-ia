@@ -1,11 +1,16 @@
 import { useTranslation } from "react-i18next";
+import { trackLanguageChange } from "@/lib/analytics";
 
 export function LanguageToggle() {
   const { i18n } = useTranslation();
   const isEn = i18n.language === "en";
   return (
     <button
-      onClick={() => i18n.changeLanguage(isEn ? "es" : "en")}
+      onClick={() => {
+        const newLang = isEn ? "es" : "en";
+        i18n.changeLanguage(newLang);
+        trackLanguageChange(newLang);
+      }}
       style={{
         display: "inline-flex", alignItems: "center", gap: 0,
         background: "#f0ece4", border: "1px solid #d8d4cc", borderRadius: 16,

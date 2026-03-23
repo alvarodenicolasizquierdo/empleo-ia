@@ -1,10 +1,11 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { type Occupation, type RawOccupation, parseOccupation, SCORE_COLORS, getScoreColor, getScoreLabel, fmt, fmtE, EU_LABELS, EU_COLORS, TIPO_LABELS, getTipoLabelContextual } from "@/lib/occupationData";
 import { squarify } from "@/lib/treemap";
 import { ScoreBadge } from "@/components/empleo/Badge";
 import { OccupationTooltip } from "@/components/empleo/OccupationTooltip";
 import { LanguageToggle } from "@/components/empleo/LanguageToggle";
+import * as analytics from "@/lib/analytics";
 
 const F = "'DM Sans', sans-serif";
 const S = "'Cormorant Garamond', serif";
@@ -216,7 +217,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         <style>{`@keyframes fadeInCard{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}`}</style>
 
         {/* Close button */}
-        <button onClick={() => setSelected(null)} style={{
+        <button onClick={() => { setSelected(null); analytics.trackOccupationClose(); }} style={{
           position: "absolute", top: 14, right: 14, background: "#f0ece4",
           border: "1px solid #d8d4cc", color: "#888", fontSize: 15, cursor: "pointer",
           borderRadius: "50%", width: 32, height: 32,
@@ -382,7 +383,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "1px", color: "#999", fontWeight: 600 }}>{t("detail.share")}</span>
           {/* X/Twitter */}
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" onClick={() => analytics.trackShare("twitter", selected?.cno || "")} style={{
             display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20,
             background: "#1a1a1a", color: "#fff", fontSize: 11, fontWeight: 600, textDecoration: "none", border: "none",
           }}>
@@ -390,7 +391,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
             X
           </a>
           {/* LinkedIn */}
-          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" onClick={() => analytics.trackShare("linkedin", selected?.cno || "")} style={{
             display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20,
             background: "#0A66C2", color: "#fff", fontSize: 11, fontWeight: 600, textDecoration: "none", border: "none",
           }}>
@@ -398,7 +399,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
             LinkedIn
           </a>
           {/* WhatsApp */}
-          <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" style={{
+          <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" onClick={() => analytics.trackShare("whatsapp", selected?.cno || "")} style={{
             display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20,
             background: "#25D366", color: "#fff", fontSize: 11, fontWeight: 600, textDecoration: "none", border: "none",
           }}>
@@ -406,7 +407,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
             WhatsApp
           </a>
           {/* Email */}
-          <a href={`mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" style={{
+          <a href={`mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" onClick={() => analytics.trackShare("email", selected?.cno || "")} style={{
             display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20,
             background: "#666", color: "#fff", fontSize: 11, fontWeight: 600, textDecoration: "none", border: "none",
           }}>
@@ -415,6 +416,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </a>
           {/* Copy */}
           <button onClick={() => {
+            analytics.trackShare("copy", selected?.cno || "");
             navigator.clipboard.writeText(shareText).then(() => {
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
@@ -506,7 +508,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         </div>
 
         {/* How to read accordion */}
-        <details style={{ marginBottom: 16 }}>
+        <details style={{ marginBottom: 16 }} onToggle={e => analytics.trackHowToReadToggle((e.target as HTMLDetailsElement).open)}>
           <summary style={{ fontSize: 11, fontWeight: 600, color: "#888", cursor: "pointer", userSelect: "none" }}>
             {t("howToRead.title")} ▾
           </summary>
@@ -528,7 +530,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <div style={{ display: "flex", alignItems: "center", gap: 0, flex: "0 1 200px", minWidth: 120, position: "relative" }}>
             <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: "#aaa" }}>🔍</span>
             <input
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              type="text" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value.length >= 3) analytics.trackSearch(e.target.value); }}
               placeholder={t("filters.searchPlaceholder")}
               style={{
                 width: "100%", background: "#f0ece4", border: "1px solid #e0dcd4", color: "#444",
@@ -548,7 +550,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
 
           {/* Sector */}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <select value={sector} onChange={e => setSector(e.target.value)} style={{
+            <select value={sector} onChange={e => { setSector(e.target.value); analytics.trackSectorFilter(e.target.value); }} style={{
               background: "#f0ece4", border: "1px solid #e0dcd4", color: "#444", borderRadius: 5,
               padding: "6px 8px", fontSize: 11, fontFamily: F, cursor: "pointer", outline: "none", maxWidth: 140,
             }}>
@@ -578,7 +580,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
 
           {/* Sort */}
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
+          <select value={sortBy} onChange={e => { setSortBy(e.target.value); analytics.trackSort(e.target.value); }} style={{
             background: "#f0ece4", border: "1px solid #e0dcd4", color: "#444", borderRadius: 5,
             padding: "6px 8px", fontSize: 11, fontFamily: F, cursor: "pointer", outline: "none",
           }}>
@@ -594,6 +596,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                 setView(m);
                 setSelected(null);
                 if (m === "detailedMap") setSector("Todos");
+                analytics.trackViewChange(m);
               }} style={{
                 padding: "5px 10px", fontSize: 10, fontFamily: F, fontWeight: 600,
                 background: view === m ? "#1a1a1a" : "transparent",
@@ -640,9 +643,11 @@ function Dashboard({ data }: { data: Occupation[] }) {
                         setSector(r.sector);
                         setHovered(null);
                         setHoveredGroup(null);
+                        analytics.trackSectorGroupClick(r.sector);
                       } else {
                         setSelected(r);
                         setHovered(null);
+                        analytics.trackOccupationSelect(r.cno, r.name, "treemap");
                       }
                     }} style={{ cursor: "pointer" }}>
                     <rect x={(r.x || 0) + 1} y={(r.y || 0) + 1}
@@ -743,7 +748,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                           style={{ transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)", cursor: "pointer" }}
                           onMouseEnter={() => { setHovered(child); setHoveredGroup(group.sector); }}
                           onMouseLeave={() => { setHovered(null); }}
-                          onClick={() => { setSelected(child); setHovered(null); }}
+                          onClick={() => { setSelected(child); setHovered(null); analytics.trackOccupationSelect(child.cno, child.name, "detailedMap"); }}
                         />
                       ))}
                     </g>
@@ -851,7 +856,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                       stroke={isH ? "#1a1a1a" : "#fff"} strokeWidth={isH ? 2 : 0.5}
                       style={{ transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)", cursor: "pointer" }}
                       onMouseEnter={() => setHovered(d)} onMouseLeave={() => setHovered(null)}
-                      onClick={() => { setSelected(d); setHovered(null); }}
+                      onClick={() => { setSelected(d); setHovered(null); analytics.trackOccupationSelect(d.cno, d.name, "scatter"); }}
                     />
                   );
                 })}
@@ -870,7 +875,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         <div style={{ padding: "0 24px 32px", maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
             {[{ k: "score", l: t("list.exposure") }, { k: "empleo", l: t("list.employment") }, { k: "salario", l: t("list.salary") }].map(s => (
-              <button key={s.k} onClick={() => setSortBy(s.k)} style={{
+              <button key={s.k} onClick={() => { setSortBy(s.k); analytics.trackSort(s.k); }} style={{
                 padding: "4px 12px", fontSize: 10, fontFamily: F, fontWeight: 600,
                 background: sortBy === s.k ? "#1a1a1a" : "transparent",
                 color: sortBy === s.k ? "#faf8f4" : "#aaa",
@@ -900,7 +905,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                 borderRadius: 4, cursor: "pointer", alignItems: "center",
                 transition: "background 0.12s"
               }}
-                onClick={() => { setSelected(item); }}
+                onClick={() => { setSelected(item); analytics.trackOccupationSelect(item.cno, item.name, "list"); }}
                 onMouseEnter={e => (e.currentTarget.style.background = "#ede8e0")}
                 onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "#f5f1eb" : "transparent")}>
                 <ScoreBadge score={item.score} />
@@ -968,7 +973,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
 
       {/* METHODOLOGY & LIMITATIONS PANEL */}
       <div style={{ padding: "0 24px 16px", maxWidth: 1200, margin: "0 auto" }}>
-        <details style={{ marginBottom: 16 }}>
+        <details style={{ marginBottom: 16 }} onToggle={e => { if ((e.target as HTMLDetailsElement).open) analytics.trackMethodologyOpen(); }}>
           <summary style={{ fontSize: 12, fontWeight: 600, color: "#666", cursor: "pointer", marginBottom: 8 }}>
             {t("methodologyPanel.title")}
           </summary>
@@ -1002,7 +1007,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <br />
           <strong style={{ color: "#999" }}>{t("methodology.internationalTitle")}</strong> {t("methodology.internationalText")}
           <br />
-          <strong style={{ color: "#999" }}>{t("methodology.llmTitle")}</strong> <span dangerouslySetInnerHTML={{ __html: t("methodology.llmText") }} /> <a href="https://doi.org/10.5281/zenodo.19165098" target="_blank" rel="noopener noreferrer" style={{ color: "#c8633a", textDecoration: "underline" }}>{t("methodology.fullMethodology")}</a>
+          <strong style={{ color: "#999" }}>{t("methodology.llmTitle")}</strong> <span dangerouslySetInnerHTML={{ __html: t("methodology.llmText") }} /> <a href="https://doi.org/10.5281/zenodo.19165098" target="_blank" rel="noopener noreferrer" onClick={() => analytics.trackMethodologyLink("zenodo")} style={{ color: "#c8633a", textDecoration: "underline" }}>{t("methodology.fullMethodology")}</a>
           <br />
           <strong style={{ color: "#999" }}>{t("methodology.noteTitle")}</strong> {t("methodology.noteText")}
         </div>
