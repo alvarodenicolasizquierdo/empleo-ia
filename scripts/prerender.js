@@ -101,6 +101,11 @@ async function prerender() {
 }
 
 prerender().catch((err) => {
+  // Gracefully skip if Playwright browsers aren't installed (e.g. CI/Docker)
+  if (err.message?.includes("Executable doesn't exist") || err.message?.includes("browserType.launch")) {
+    console.log("  ⚠ Playwright browsers not installed, skipping pre-render (SPA will still work).");
+    process.exit(0);
+  }
   console.error("Pre-render failed:", err.message);
   process.exit(1);
 });
