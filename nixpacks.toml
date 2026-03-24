@@ -1,0 +1,9 @@
+# Override Caddy config to use our custom Caddyfile
+# Everything else (install, build) is auto-detected by Nixpacks
+
+[phases.fmt]
+dependsOn = ['caddy']
+cmds = ['caddy fmt --overwrite /app/Caddyfile']
+
+[start]
+cmd = 'exec caddy run --config /app/Caddyfile --adapter caddyfile 2>&1'
