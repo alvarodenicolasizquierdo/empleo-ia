@@ -1,8 +1,0 @@
-:80 {
-	root * /app/dist
-	encode gzip
-
-	# Serve actual files first, then SPA fallback
-	try_files {path} /index.html
-	file_server
-}
