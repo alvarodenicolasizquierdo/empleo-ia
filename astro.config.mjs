@@ -1,14 +1,14 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+
+// Tailwind works via postcss.config.js + tailwind.config.ts (no @astrojs/tailwind needed in Astro 6)
 
 export default defineConfig({
   site: 'https://empleo-ai.anlakstudio.com',
   output: 'static',
   integrations: [
     react(),
-    tailwind(),
     sitemap({
       i18n: {
         defaultLocale: 'es',
