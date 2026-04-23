@@ -12,9 +12,6 @@
     "preview": "astro preview",
     "dev:vite": "vite",
     "build:vite": "vite build",
-    "build:seo": "node scripts/generate-seo.js",
-    "build:prerender": "node scripts/prerender.js",
-    "build:legacy": "vite build && node scripts/generate-seo.js && node scripts/prerender.js",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest"

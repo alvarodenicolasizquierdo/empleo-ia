@@ -17,7 +17,7 @@ const { sector } = Astro.props;
 const title = `${sector.sector} — Vulnerabilidad a la IA por sector`;
 const description = `Sector ${sector.sector}: ${sector.count} ocupaciones, ${sector.employment.toLocaleString("es-ES")} trabajadores, score medio de vulnerabilidad IA ${sector.avgScore}/10. ${sector.highRiskCount} ocupaciones de alto riesgo.`;
 
-const jsonLd = {
+const itemListJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   "name": `Ocupaciones del sector ${sector.sector} — Vulnerabilidad IA`,
@@ -32,13 +32,25 @@ const jsonLd = {
     })),
 };
 
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": new URL("/", Astro.site).href },
+    { "@type": "ListItem", "position": 2, "name": "Sectores", "item": new URL("/sector/", Astro.site).href },
+    { "@type": "ListItem", "position": 3, "name": sector.sector, "item": Astro.url.href },
+  ],
+};
+
+const jsonLd = [itemListJsonLd, breadcrumbJsonLd];
+
 const sorted = [...sector.occupations].sort((a, b) => b.vulnerabilidad_ia_score - a.vulnerabilidad_ia_score);
 
 const F = "'DM Sans', sans-serif";
 const S = "'Cormorant Garamond', serif";
 ---
 
-<Base title={title} description={description} jsonLd={jsonLd}>
+<Base title={title} description={description} jsonLd={jsonLd} lang="es" alternatePath={`/en/sector/${sector.slug}`}>
   <div style={`background:#faf8f4;color:#1a1a1a;min-height:100vh;font-family:${F};`}>
     <article style="max-width:1200px;margin:0 auto;padding:28px 24px;">
 

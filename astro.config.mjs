@@ -10,12 +10,8 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      i18n: {
-        defaultLocale: 'es',
-        locales: { es: 'es-ES', en: 'en-US' },
-      },
       serialize: (item) => {
-        if (item.url.includes('/ocupacion/')) {
+        if (item.url.includes('/ocupacion/') || item.url.includes('/occupation/')) {
           item.changefreq = 'monthly';
           item.priority = 0.8;
         } else if (item.url.includes('/sector/')) {

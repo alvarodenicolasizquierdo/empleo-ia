@@ -1,0 +1,154 @@
+---
+import Base from "../../../layouts/Base.astro";
+import ScoreBadgeStatic from "../../../components/astro/ScoreBadgeStatic.astro";
+import { loadAllOccupations, getSectorStats, sectorSlug, occupationSlug } from "@/data/loadOccupations";
+import { t } from "@/i18n/pages";
+
+export async function getStaticPaths() {
+  const { es, enByCno } = loadAllOccupations();
+  const sectors = getSectorStats(es);
+  return sectors.map((s) => {
+    const enOccs = s.occupations.map((occ) => enByCno.get(occ.cno) ?? occ);
+    return {
+      params: { slug: s.slug },
+      props: { sector: s, enOccs },
+    };
+  });
+}
+
+const { sector, enOccs } = Astro.props;
+const lang = "en" as const;
+
+const sectorNameEn = enOccs[0]?.sector ?? sector.sector;
+
+const title = `${sectorNameEn} — AI vulnerability by sector`;
+const description = `${sectorNameEn} sector: ${sector.count} occupations, ${sector.employment.toLocaleString("en-US")} workers, average AI vulnerability score ${sector.avgScore}/10. ${sector.highRiskCount} high-risk occupations.`;
+
+const itemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": `${sectorNameEn} — AI vulnerability of occupations`,
+  "numberOfItems": sector.count,
+  "itemListElement": sector.occupations
+    .map((occ) => ({ occ, en: enOccs.find((e) => e.cno === occ.cno) ?? occ }))
+    .sort((a, b) => b.occ.vulnerabilidad_ia_score - a.occ.vulnerabilidad_ia_score)
+    .map((x, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `https://empleo-ai.anlakstudio.com/en/occupation/${occupationSlug(x.occ)}`,
+      "name": x.en.nombre,
+    })),
+};
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": t(lang, "home"), "item": new URL("/en/", Astro.site).href },
+    { "@type": "ListItem", "position": 2, "name": t(lang, "sectors"), "item": new URL("/en/sector/", Astro.site).href },
+    { "@type": "ListItem", "position": 3, "name": sectorNameEn, "item": Astro.url.href },
+  ],
+};
+
+const sorted = [...sector.occupations]
+  .map((occ) => ({ occ, en: enOccs.find((e) => e.cno === occ.cno) ?? occ }))
+  .sort((a, b) => b.occ.vulnerabilidad_ia_score - a.occ.vulnerabilidad_ia_score);
+
+const F = "'DM Sans', sans-serif";
+const S = "'Cormorant Garamond', serif";
+---
+
+<Base title={title} description={description} jsonLd={[itemListJsonLd, breadcrumbJsonLd]} lang="en" alternatePath={`/sector/${sector.slug}`}>
+  <div style={`background:#faf8f4;color:#1a1a1a;min-height:100vh;font-family:${F};`}>
+    <article style="max-width:1200px;margin:0 auto;padding:28px 24px;">
+
+      <nav style="font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:#bbb;margin-bottom:6px;">
+        <a href="/en/" style="color:#c8633a;text-decoration:none;">{t(lang, "home")}</a>
+        <span style="margin:0 4px;">›</span>
+        <a href="/en/sector/" style="color:#c8633a;text-decoration:none;">{t(lang, "sectors")}</a>
+        <span style="margin:0 4px;">›</span>
+        <span>{sectorNameEn}</span>
+        <span style="margin:0 10px;color:#ddd;">·</span>
+        <a href={`/sector/${sector.slug}`} style="color:#aaa;text-decoration:none;">🌐 Español</a>
+      </nav>
+
+      <h1 style={`font-size:clamp(26px,3.5vw,44px);font-family:${S};font-weight:600;margin:0 0 4px;line-height:1.08;color:#1a1a1a;`}>
+        {sectorNameEn}
+      </h1>
+      <p style="font-size:14px;color:#888;line-height:1.55;margin:0 0 20px;">
+        {sector.count} occupations · {sector.employment.toLocaleString("en-US")} workers · Avg. AI score: {sector.avgScore}/10
+      </p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+        <div style="padding:12px 16px;background:#f0ece4;border-radius:6px;flex:1 1 150px;min-width:140px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.3px;color:#aaa;margin-bottom:4px;">{t(lang, "occupations")}</div>
+          <div style={`font-size:22px;font-weight:700;font-family:${S};line-height:1.1;color:#1a1a1a;`}>{sector.count}</div>
+        </div>
+        <div style="padding:12px 16px;background:#f0ece4;border-radius:6px;flex:1 1 150px;min-width:140px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.3px;color:#aaa;margin-bottom:4px;">{t(lang, "totalEmployment")}</div>
+          <div style={`font-size:22px;font-weight:700;font-family:${S};line-height:1.1;color:#1a1a1a;`}>
+            {sector.employment >= 1e6 ? (sector.employment / 1e6).toFixed(1) + "M" : sector.employment.toLocaleString("en-US")}
+          </div>
+          <div style="font-size:10px;color:#b08050;margin-top:2px;font-style:italic;">EPA Q4 2025</div>
+        </div>
+        <div style="padding:12px 16px;background:#f0ece4;border-radius:6px;flex:1 1 150px;min-width:140px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.3px;color:#aaa;margin-bottom:4px;">{t(lang, "avgSectorExposure")}</div>
+          <div style={`font-size:22px;font-weight:700;font-family:${S};line-height:1.1;color:#1a1a1a;`}>{sector.avgScore} / 10</div>
+          <div style="font-size:10px;color:#b08050;margin-top:2px;font-style:italic;">{t(lang, "weightedByEmployment")}</div>
+        </div>
+        <div style="padding:12px 16px;background:#f0ece4;border-radius:6px;flex:1 1 150px;min-width:140px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.3px;color:#aaa;margin-bottom:4px;">{t(lang, "avgSalary")}</div>
+          <div style={`font-size:22px;font-weight:700;font-family:${S};line-height:1.1;color:#1a1a1a;`}>
+            {sector.avgSalary.toLocaleString("en-US")} €
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:#f0ece4;border-radius:6px;flex:1 1 150px;min-width:140px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.3px;color:#aaa;margin-bottom:4px;">{t(lang, "highRisk")}</div>
+          <div style={`font-size:22px;font-weight:700;font-family:${S};line-height:1.1;color:#c8633a;`}>
+            {sector.highRiskCount}
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:2px;">{t(lang, "scoreGt7")}</div>
+        </div>
+      </div>
+
+      <div style="font-size:10px;color:#b08050;background:#fdf6ee;border:1px solid #f0dcc0;border-radius:5px;padding:8px 12px;margin-bottom:20px;line-height:1.5;">
+        <strong>{t(lang, "note")}:</strong> {t(lang, "employmentDisclaimer")}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="display:grid;grid-template-columns:40px 1fr 110px 90px 90px 90px;gap:6px;padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#bbb;font-weight:600;border-bottom:1px solid #e8e4dc;">
+          <div>{t(lang, "score")}</div>
+          <div>{t(lang, "occupation")}</div>
+          <div>{t(lang, "cnoCode")}</div>
+          <div style="text-align:right;">{t(lang, "employment")}</div>
+          <div style="text-align:right;">{t(lang, "salary")}</div>
+          <div style="text-align:right;">{t(lang, "euAiAct")}</div>
+        </div>
+        {sorted.map(({ occ, en }, i) => (
+          <a href={`/en/occupation/${occupationSlug(occ)}`} style={`display:grid;grid-template-columns:40px 1fr 110px 90px 90px 90px;gap:6px;padding:8px 10px;font-size:12px;background:${i % 2 === 0 ? "#f5f1eb" : "transparent"};border-radius:4px;text-decoration:none;color:#1a1a1a;align-items:center;`}>
+            <div>
+              <ScoreBadgeStatic score={occ.vulnerabilidad_ia_score} />
+            </div>
+            <div>
+              <div style="font-weight:600;color:#1a1a1a;">{en.nombre}</div>
+            </div>
+            <div style="font-size:10px;color:#bbb;">{occ.cno}</div>
+            <div style="text-align:right;color:#555;font-variant-numeric:tabular-nums;">{occ.empleo.toLocaleString("en-US")}</div>
+            <div style="text-align:right;color:#555;font-variant-numeric:tabular-nums;">{occ.salario_medio_eur.toLocaleString("en-US")} €</div>
+            <div style="text-align:right;">
+              <span style={`font-size:9px;padding:2px 7px;border-radius:8px;background:${en.eu_ai_act.toLowerCase().includes("alto") || en.eu_ai_act.toLowerCase().includes("high") ? "#c8633a15" : en.eu_ai_act.toLowerCase().includes("limitado") || en.eu_ai_act.toLowerCase().includes("limited") ? "#d4a85a15" : "#3a7d9e15"};color:${en.eu_ai_act.toLowerCase().includes("alto") || en.eu_ai_act.toLowerCase().includes("high") ? "#c8633a" : en.eu_ai_act.toLowerCase().includes("limitado") || en.eu_ai_act.toLowerCase().includes("limited") ? "#d4a85a" : "#3a7d9e"};font-weight:600;`}>
+                {en.eu_ai_act}
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e8e4dc;">
+        <div style="font-size:10px;color:#bbb;line-height:1.65;">
+          <strong style="color:#999;">{t(lang, "sourceLabel")}</strong> {t(lang, "sourceLine")}
+        </div>
+      </div>
+    </article>
+  </div>
+</Base>
