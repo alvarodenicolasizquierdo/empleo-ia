@@ -15,9 +15,9 @@ const title = "Vulnerabilidad de Empleos a la IA en España";
 const description = `Análisis interactivo de exposición a la IA de las ${es.length} ocupaciones del mercado laboral español · ${stats.totalEmployment.toLocaleString("es-ES")} trabajadores · EPA Q4 2025 · Metodología v30`;
 ---
 
-<Base title={title} description={description} jsonLd={[datasetJsonLd, faqJsonLd]}>
-  <!-- React Dashboard island — interactive, hydrated client-side -->
-  <DashboardIsland client:load />
+<Base title={title} description={description} jsonLd={[datasetJsonLd, faqJsonLd]} lang="es" alternatePath="/en/">
+  <!-- React Dashboard island — hydrated when the browser is idle, keeping first paint fast -->
+  <DashboardIsland client:idle />
 
   <!-- Navigation to static pages -->
   <nav style="max-width:1200px;margin:0 auto;padding:16px 24px;font-family:'DM Sans',sans-serif;">

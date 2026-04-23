@@ -1,0 +1,41 @@
+---
+import Base from "../../layouts/Base.astro";
+import DashboardIsland from "../../components/react/DashboardIsland";
+import OccupationTable from "../../components/astro/OccupationTable.astro";
+import SectorSummary from "../../components/astro/SectorSummary.astro";
+import { loadAllOccupations, getSectorStats, getAggregateStats, generateDatasetJsonLd, generateFaqJsonLd } from "../../data/loadOccupations";
+
+const { es, en } = loadAllOccupations();
+const sectors = getSectorStats(es);
+const stats = getAggregateStats(es);
+const datasetJsonLd = generateDatasetJsonLd(es);
+const faqJsonLd = generateFaqJsonLd(es);
+
+const title = "AI Job Vulnerability in Spain";
+const description = `Interactive analysis of AI exposure for all ${es.length} occupations in the Spanish labor market · ${stats.totalEmployment.toLocaleString("en-US")} workers · EPA Q4 2025 · Methodology v30`;
+---
+
+<Base title={title} description={description} jsonLd={[datasetJsonLd, faqJsonLd]} lang="en" alternatePath="/">
+  <DashboardIsland client:idle />
+
+  <nav style="max-width:1200px;margin:0 auto;padding:16px 24px;font-family:'DM Sans',sans-serif;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 18px;background:#f0ece4;border-radius:8px;border:1px solid #e0dcd4;">
+      <span style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#999;font-weight:600;margin-right:4px;">Explore the data</span>
+      <a href="/en/sector/" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:#1a1a1a;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
+        📊 Browse the {sectors.length} sectors
+      </a>
+      <a href="#seo-occupation-table" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:transparent;color:#666;border:1px solid #d8d4cc;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
+        📋 Table of {es.length} occupations
+      </a>
+      <a href="/llms.txt" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:transparent;color:#666;border:1px solid #d8d4cc;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
+        🤖 llms.txt
+      </a>
+      <a href="/" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:transparent;color:#666;border:1px solid #d8d4cc;border-radius:5px;text-decoration:none;letter-spacing:0.3px;margin-left:auto;">
+        🌐 Español
+      </a>
+    </div>
+  </nav>
+
+  <SectorSummary sectors={sectors} />
+  <OccupationTable occupations={es} enOccupations={en} />
+</Base>
