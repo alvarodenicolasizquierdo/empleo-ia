@@ -20,7 +20,7 @@ const scoreColor = SCORE_COLORS[colorIndex];
 const title = `${occ.nombre} — Vulnerabilidad IA ${score}/10`;
 const description = `${occ.nombre} (CNO ${occ.cno}): score de vulnerabilidad a la IA de ${score}/10, ${occ.empleo.toLocaleString("es-ES")} empleados, salario medio ${occ.salario_medio_eur.toLocaleString("es-ES")} €. Sector: ${occ.sector}.`;
 
-const jsonLd = {
+const occupationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Occupation",
   "name": occ.nombre,
@@ -36,6 +36,19 @@ const jsonLd = {
   "occupationLocation": { "@type": "Country", "name": "Spain" },
   "mainEntityOfPage": Astro.url.href,
 };
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": new URL("/", Astro.site).href },
+    { "@type": "ListItem", "position": 2, "name": "Sectores", "item": new URL("/sector/", Astro.site).href },
+    { "@type": "ListItem", "position": 3, "name": occ.sector, "item": new URL(`/sector/${sectorSlug(occ.sector)}`, Astro.site).href },
+    { "@type": "ListItem", "position": 4, "name": occ.nombre, "item": Astro.url.href },
+  ],
+};
+
+const jsonLd = [occupationJsonLd, breadcrumbJsonLd];
 
 const wageIndex = occ.empleo * occ.salario_medio_eur * (score / 10);
 const wageLabel = wageIndex >= 1e9 ? (wageIndex / 1e9).toFixed(1) + "B €" : (wageIndex / 1e6).toFixed(0) + "M €";

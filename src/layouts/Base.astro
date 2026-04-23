@@ -13,8 +13,21 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
 const image = ogImage || new URL('/og-image.png', Astro.site).href;
 const siteName = "Vulnerabilidad Laboral a la IA · España 2026";
 
-// Normalize jsonLd to array
-const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Anlak Studio",
+  "url": Astro.site?.toString(),
+  "logo": new URL('/favicon_preview_512.png', Astro.site).href,
+  "founder": [
+    { "@type": "Person", "name": "Álvaro de Nicolás" },
+    { "@type": "Person", "name": "Miguel Sureda" },
+  ],
+};
+
+// Normalize jsonLd to array and prepend Organization
+const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const jsonLdItems = [organizationJsonLd, ...pageJsonLd];
 ---
 
 <html lang="es">
