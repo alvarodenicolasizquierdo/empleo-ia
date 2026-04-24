@@ -1,15 +1,38 @@
 import { useTranslation } from "react-i18next";
 import { trackLanguageChange } from "@/lib/analytics";
 
+/**
+ * Map the current URL to its counterpart-language URL.
+ * ES pages live at `/`, `/sector/...`, `/ocupacion/...`.
+ * EN pages live at `/en/`, `/en/sector/...`, `/en/occupation/...`.
+ * Query string and hash are preserved.
+ */
+function counterpartPath(pathname: string, targetLang: "es" | "en"): string {
+  if (targetLang === "en") {
+    if (pathname === "/" || pathname === "") return "/en/";
+    if (pathname.startsWith("/en/") || pathname === "/en") return pathname;
+    if (pathname.startsWith("/ocupacion/")) return "/en/occupation/" + pathname.slice("/ocupacion/".length);
+    if (pathname.startsWith("/sector/")) return "/en" + pathname;
+    return "/en" + pathname;
+  }
+  // targetLang === "es"
+  if (pathname === "/en/" || pathname === "/en") return "/";
+  if (pathname.startsWith("/en/occupation/")) return "/ocupacion/" + pathname.slice("/en/occupation/".length);
+  if (pathname.startsWith("/en/sector/")) return pathname.slice("/en".length);
+  if (pathname.startsWith("/en/")) return pathname.slice("/en".length);
+  return pathname;
+}
+
 export function LanguageToggle() {
   const { i18n } = useTranslation();
   const isEn = i18n.language === "en";
   return (
     <button
       onClick={() => {
-        const newLang = isEn ? "es" : "en";
-        i18n.changeLanguage(newLang);
+        const newLang: "es" | "en" = isEn ? "es" : "en";
         trackLanguageChange(newLang);
+        const { pathname, search, hash } = window.location;
+        window.location.href = counterpartPath(pathname, newLang) + search + hash;
       }}
       style={{
         display: "inline-flex", alignItems: "center", gap: 0,
