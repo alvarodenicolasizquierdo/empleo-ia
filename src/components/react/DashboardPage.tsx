@@ -200,7 +200,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
               {t("histogram.title")}
             </div>
             <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
-              {filtered.length} {t("histogram.filtered", "ocupaciones filtradas")} · {t("histogram.scale", "Escala 0 (mínima) → 10 (máxima)")}
+              {filtered.length} {t("histogram.filtered")} · {t("histogram.scale")}
             </div>
           </div>
           <a href="https://doi.org/10.5281/zenodo.19076797" target="_blank" rel="noopener noreferrer"
@@ -220,7 +220,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
               <polyline points="15 3 21 3 21 9"/>
               <line x1="10" y1="14" x2="21" y2="3"/>
             </svg>
-            {t("histogram.methodologyPdf", "Metodología V20 (PDF)")}
+            {t("histogram.methodologyPdf")}
           </a>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, justifyContent: "center", height: 100 }}>
@@ -255,14 +255,14 @@ function Dashboard({ data }: { data: Occupation[] }) {
     if (!selected) return null;
     const wage = selected.empleo * selected.salario * (selected.score / 10);
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-    const empText = selected.empleo >= 1e6 ? (selected.empleo / 1e6).toFixed(1) + "M" : selected.empleo >= 1e3 ? (selected.empleo / 1e3).toFixed(0) + "K" : fmt(selected.empleo);
+    const empText = fmtEmployment(selected.empleo);
     const shareText = t("detail.shareText", {
-      name: selected.name, cno: selected.cno, score: selected.score.toFixed(1),
+      name: selected.name, cno: selected.cno, score: fmtDecimal(selected.score, 1),
       employees: empText, salary: fmtE(selected.salario),
-      index: wage >= 1e9 ? (wage / 1e9).toFixed(1) + "B \u20AC" : (wage / 1e6).toFixed(0) + "M \u20AC",
+      index: wage >= 1e9 ? fmtDecimal(wage / 1e9, 1) + "B \u20AC" : fmtDecimal(wage / 1e6, 0) + "M \u20AC",
       impact: TIPO_LABELS[selected.tipo], risk: EU_LABELS[selected.euRisk],
     }) + ` ${shareUrl}`;
-    const shareSubject = `${selected.name} \u2014 ${t("detail.exposure")} ${selected.score.toFixed(1)}/10`;
+    const shareSubject = `${selected.name} \u2014 ${t("detail.exposureLabel", { level: getScoreLabel(selected.score) })} ${fmtDecimal(selected.score, 1)}/10`;
 
     return (
       <div style={{
@@ -298,7 +298,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
             <div style={{ fontSize: 15, fontWeight: 600, color: getScoreColor(selected.score) }}>
               {t("detail.exposureLabel", { level: getScoreLabel(selected.score) })}
             </div>
-            <div style={{ fontSize: 12, color: "#888" }}>{selected.score.toFixed(1)} / 10</div>
+            <div style={{ fontSize: 12, color: "#888" }}>{fmtDecimal(selected.score, 1)} / 10</div>
             <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("detail.theoreticalCaveat")}</div>
           </div>
         </div>
@@ -308,7 +308,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <div style={{ padding: 14, background: "#f0ece4", borderRadius: 6 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 3 }}>{t("detail.employees")}</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", fontFamily: S }}>
-              {selected.empleo >= 1e6 ? (selected.empleo / 1e6).toFixed(1) + "M" : selected.empleo >= 1e3 ? Math.round(selected.empleo / 1e3) + "K" : fmt(selected.empleo)}
+              {fmtEmployment(selected.empleo)}
             </div>
           </div>
           <div style={{ padding: 14, background: "#f0ece4", borderRadius: 6 }}>
@@ -318,7 +318,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <div style={{ padding: 14, background: "#f0ece4", borderRadius: 6 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 3 }}>{t("detail.wageIndex")}</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: "#c8633a", fontFamily: S }}>
-              {wage >= 1e9 ? (wage / 1e9).toFixed(1) + "B €" : (wage / 1e6).toFixed(0) + "M €"}
+              {wage >= 1e9 ? fmtDecimal(wage / 1e9, 1) + "B €" : fmtDecimal(wage / 1e6, 0) + "M €"}
             </div>
             <div style={{ fontSize: 10, color: "#c8633a", marginTop: 2, fontWeight: 600 }}>{t("detail.wageSubtitle")}</div>
           </div>
@@ -344,7 +344,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
                         <span style={{ fontSize: 10, color: "#666" }}>{b.label}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#1a1a1a", fontFamily: S }}>{b.value.toFixed(1)}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#1a1a1a", fontFamily: S }}>{fmtDecimal(b.value, 1)}</span>
                       </div>
                       <div style={{ height: 6, background: "#e0dcd4", borderRadius: 3, overflow: "hidden" }}>
                         <div style={{ height: "100%", width: `${(b.value / 10) * 100}%`, background: b.color, borderRadius: 3, transition: "width 0.4s ease-out" }} />
@@ -358,7 +358,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                   {t("detail.rescoreFormula")}: <code style={{ fontSize: 10, background: "#e8e4dc", padding: "1px 5px", borderRadius: 3 }}>{selected.rescoreFormula}</code>
                 </span>
                 <span style={{ fontSize: 10, color: "#888", fontWeight: 600 }}>
-                  {t("detail.rescored", { from: selected.scoreV9?.toFixed(1), to: selected.score.toFixed(1) })}
+                  {t("detail.rescored", { from: selected.scoreV9 != null ? fmtDecimal(selected.scoreV9, 1) : "—", to: fmtDecimal(selected.score, 1) })}
                 </span>
               </div>
               <div style={{ marginTop: 8, fontSize: 9, color: "#aaa", fontStyle: "italic", lineHeight: 1.5 }}>
@@ -548,18 +548,18 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
           <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.weightedExposure")}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{stats.ws.toFixed(1)} / 10</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{fmtDecimal(stats.ws, 1)} / 10</div>
             <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("stats.avgVulnMicro")}</div>
           </div>
           <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.highExposure")}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{stats.hp.toFixed(1)}%</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{fmtDecimal(stats.hp, 1)}%</div>
             <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{t("stats.jobs", { count: fmt(stats.he) })}</div>
             <div style={{ fontSize: 10, color: "#b08050", marginTop: 1, fontStyle: "italic" }}>{t("stats.highVulnMicro")}</div>
           </div>
           <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.wageIndex")}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{(stats.tw / 1e9).toFixed(1)}B €</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{fmtDecimal(stats.tw / 1e9, 1)}B €</div>
             <div style={{ fontSize: 10, color: "#c8633a", marginTop: 2, fontWeight: 600 }}>{t("stats.wageSubtitle")}</div>
           </div>
         </div>
@@ -744,6 +744,8 @@ function Dashboard({ data }: { data: Occupation[] }) {
                       fill={getScoreColor(r.score)} opacity={isH ? 1 : 0.85} rx={4}
                       stroke={isH ? "#1a1a1a" : "#faf8f4"} strokeWidth={isH ? 4 : 2}
                       style={{ transition: "all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)" }} />
+                    {/* Native browser tooltip as a fallback when the rect is too small to fit the label. */}
+                    <title>{r.name} — Score {fmtDecimal(r.score, 1)} / 10</title>
                     {show && (
                       <foreignObject x={(r.x || 0) + 6} y={(r.y || 0) + 6} width={(r.w || 0) - 12} height={(r.h || 0) - 12} style={{ pointerEvents: "none" }}>
                         <div style={{
@@ -767,7 +769,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                                   border: `1px solid ${r.score > 5 ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.15)"}`,
                                   backdropFilter: "blur(4px)"
                                 }}>
-                                  Score: {r.score.toFixed(1)} / 10
+                                  Score: {fmtDecimal(r.score, 1)} / 10
                                 </div>
                                 <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.9 }}>{r.ocupaciones} {t("treemap.occupations")}</span>
                               </div>
@@ -782,7 +784,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                                 padding: "2px 6px", borderRadius: 3, fontSize: 10, fontWeight: 700,
                                 width: "fit-content", backdropFilter: "blur(4px)"
                               }}>
-                                Score: {r.score.toFixed(1)}
+                                Score: {fmtDecimal(r.score, 1)}
                               </div>
                               <div style={{ fontSize: 9, opacity: 0.8, fontWeight: 400 }}>{fmt(r.empleo)} {t("treemap.empl")}</div>
                             </div>
@@ -830,15 +832,18 @@ function Dashboard({ data }: { data: Occupation[] }) {
                     />
                     <g style={{ opacity: isGroupHovered ? 1 : 0.85, transition: "opacity 0.2s" }}>
                       {(group.children || []).map(child => (
-                        <rect key={child.cno} x={child.x} y={child.y} width={child.w} height={child.h}
-                          fill={getScoreColor(child.score)}
-                          stroke={isGroupHovered ? "#faf8f4" : "rgba(255,255,255,0.3)"}
-                          strokeWidth={isGroupHovered ? 1 : 0.5} rx={2}
-                          style={{ transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)", cursor: "pointer" }}
-                          onMouseEnter={() => { setHovered(child); setHoveredGroup(group.sector); }}
-                          onMouseLeave={() => { setHovered(null); }}
-                          onClick={() => { setSelectedCno(child.cno); setHovered(null); analytics.trackOccupationSelect(child.cno, child.name, "detailedMap"); }}
-                        />
+                        <g key={child.cno}>
+                          <rect x={child.x} y={child.y} width={child.w} height={child.h}
+                            fill={getScoreColor(child.score)}
+                            stroke={isGroupHovered ? "#faf8f4" : "rgba(255,255,255,0.3)"}
+                            strokeWidth={isGroupHovered ? 1 : 0.5} rx={2}
+                            style={{ transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)", cursor: "pointer" }}
+                            onMouseEnter={() => { setHovered(child); setHoveredGroup(group.sector); }}
+                            onMouseLeave={() => { setHovered(null); }}
+                            onClick={() => { setSelectedCno(child.cno); setHovered(null); analytics.trackOccupationSelect(child.cno, child.name, "detailedMap"); }}
+                          />
+                          <title>{child.name} — Score {fmtDecimal(child.score, 1)} / 10</title>
+                        </g>
                       ))}
                     </g>
                     <g style={{ pointerEvents: "none" }}>
@@ -940,13 +945,16 @@ function Dashboard({ data }: { data: Occupation[] }) {
                     : (d.score / 10) * 12 + 3;
                   const r = Math.max(3, Math.min(25, baseR));
                   return (
-                    <circle key={d.cno} cx={x} cy={y} r={isH ? r * 1.5 : r}
-                      fill={getScoreColor(d.score)} opacity={isH ? 1 : 0.6}
-                      stroke={isH ? "#1a1a1a" : "#fff"} strokeWidth={isH ? 2 : 0.5}
-                      style={{ transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)", cursor: "pointer" }}
-                      onMouseEnter={() => setHovered(d)} onMouseLeave={() => setHovered(null)}
-                      onClick={() => { setSelectedCno(d.cno); setHovered(null); analytics.trackOccupationSelect(d.cno, d.name, "scatter"); }}
-                    />
+                    <g key={d.cno}>
+                      <circle cx={x} cy={y} r={isH ? r * 1.5 : r}
+                        fill={getScoreColor(d.score)} opacity={isH ? 1 : 0.6}
+                        stroke={isH ? "#1a1a1a" : "#fff"} strokeWidth={isH ? 2 : 0.5}
+                        style={{ transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)", cursor: "pointer" }}
+                        onMouseEnter={() => setHovered(d)} onMouseLeave={() => setHovered(null)}
+                        onClick={() => { setSelectedCno(d.cno); setHovered(null); analytics.trackOccupationSelect(d.cno, d.name, "scatter"); }}
+                      />
+                      <title>{d.name} — Score {fmtDecimal(d.score, 1)} / 10</title>
+                    </g>
                   );
                 })}
               </svg>
@@ -1062,9 +1070,9 @@ function Dashboard({ data }: { data: Occupation[] }) {
                 ].map(([label, avg, pct, tw], i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #f0ece4", background: i === 0 ? "#f9f6f0" : "transparent" }}>
                     <td style={{ padding: "6px 10px", color: i === 0 ? "#1a1a1a" : "#666", fontWeight: i === 0 ? 600 : 400 }}>{label as string}</td>
-                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{(avg as number).toFixed(1)}</td>
-                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{pct !== null ? (pct as number).toFixed(1) + "%" : "—"}</td>
-                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{((tw as number) / 1e9).toFixed(1)}B €</td>
+                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtDecimal(avg as number, 1)}</td>
+                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{pct !== null ? fmtDecimal(pct as number, 1) + "%" : "—"}</td>
+                    <td style={{ padding: "6px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtDecimal((tw as number) / 1e9, 1)}B €</td>
                   </tr>
                 ))}
               </tbody>

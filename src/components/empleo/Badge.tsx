@@ -1,4 +1,4 @@
-import { getScoreColor } from "@/lib/occupationData";
+import { getScoreColor, fmtDecimal } from "@/lib/occupationData";
 
 interface BadgeProps {
   score: number;
@@ -15,6 +15,6 @@ export function ScoreBadge({ score, size = "sm" }: BadgeProps) {
       fontSize: size === "lg" ? 16 : 10, fontWeight: 700,
       color: score > 5 ? "#fff" : "#1a1a1a", flexShrink: 0,
       boxShadow: `0 1px 4px ${c}55`,
-    }}>{score.toFixed(1)}</div>
+    }}>{fmtDecimal(score, 1)}</div>
   );
 }

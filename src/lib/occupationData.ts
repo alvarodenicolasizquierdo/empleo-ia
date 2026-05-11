@@ -126,6 +126,26 @@ export const TIPO_LABELS: Record<string, string> = new Proxy({} as Record<string
 });
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
+
+// Sector values are localised in the dataset (the EN JSON ships translated sector
+// strings). Normalise to the Spanish canonical key so the dropdown value, URL deep
+// links, and the i18n lookup table (`sectors.{key}`) stay consistent across locales.
+const SECTOR_EN_TO_ES: Record<string, string> = {
+  "Administration": "Administración",
+  "Agriculture": "Agricultura",
+  "Crafts & Manufacturing": "Artesanía y manufactura",
+  "Construction": "Construcción",
+  "Management": "Dirección",
+  "Elementary": "Elementales",
+  "Industry": "Industria",
+  "Food Industry": "Industria alimentaria",
+  "Military": "Militar",
+  "Professionals": "Profesionales",
+  "Services": "Servicios",
+  "Support Technicians": "Técnicos apoyo",
+};
+export const canonicalSector = (s: string): string => SECTOR_EN_TO_ES[s] ?? s;
+
 export const mapEuRisk = (riesgo: string): Occupation["euRisk"] => {
   const r = (riesgo || "").toLowerCase();
   if (r.includes("mínimo") || r.includes("minimal")) return "minimal";
@@ -169,7 +189,7 @@ export const fmtDecimal = (n: number, digits = 3): string =>
 export const parseOccupation = (d: RawOccupation): Occupation => ({
   cno: d.cno,
   name: d.nombre,
-  sector: d.sector,
+  sector: canonicalSector(d.sector),
   empleo: d.empleo,
   salario: d.salario_medio_eur,
   score: d.vulnerabilidad_ia_score,
