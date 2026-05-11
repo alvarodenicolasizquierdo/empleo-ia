@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { type Occupation, type RawOccupation, parseOccupation, SCORE_COLORS, getScoreColor, getScoreLabel, fmt, fmtE, EU_LABELS, EU_COLORS, TIPO_LABELS, getTipoLabelContextual } from "@/lib/occupationData";
+import { type Occupation, type RawOccupation, parseOccupation, SCORE_COLORS, getScoreColor, getScoreLabel, fmt, fmtE, fmtEmployment, fmtDecimal, EU_LABELS, EU_COLORS, TIPO_LABELS, getTipoLabelContextual } from "@/lib/occupationData";
 import { squarify } from "@/lib/treemap";
 import { ScoreBadge } from "@/components/empleo/Badge";
 import { OccupationTooltip } from "@/components/empleo/OccupationTooltip";
@@ -10,23 +10,75 @@ import * as analytics from "@/lib/analytics";
 const F = "'DM Sans', sans-serif";
 const S = "'Cormorant Garamond', serif";
 
+// Read initial UI state from URL params (?sector, ?min, ?max, ?q, ?sort, ?view, ?cno).
+// Persists across language toggles and is shareable as a deep link.
+function readInitialState() {
+  if (typeof window === "undefined") return null;
+  const p = new URLSearchParams(window.location.search);
+  return {
+    sector: p.get("sector") ?? "Todos",
+    range: [Number(p.get("min") ?? 0), Number(p.get("max") ?? 10)] as [number, number],
+    search: p.get("q") ?? "",
+    sortBy: p.get("sort") ?? "empleo",
+    view: p.get("view") ?? "detailedMap",
+    cno: p.get("cno"),
+  };
+}
+
+function writeStateToUrl(params: Record<string, string | number | null | undefined>) {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  for (const [k, v] of Object.entries(params)) {
+    if (v === null || v === undefined || v === "" || v === "Todos" ||
+        (k === "min" && v === 0) || (k === "max" && v === 10) ||
+        (k === "sort" && v === "empleo") || (k === "view" && v === "detailedMap")) {
+      url.searchParams.delete(k);
+    } else {
+      url.searchParams.set(k, String(v));
+    }
+  }
+  window.history.replaceState({}, "", url.toString());
+}
+
 function Dashboard({ data }: { data: Occupation[] }) {
   const { t } = useTranslation();
   const OCCUPATIONS_DATA = data;
   const SECTORS = useMemo(() => [...new Set(OCCUPATIONS_DATA.map(d => d.sector))].sort(), [OCCUPATIONS_DATA]);
+  const initial = useMemo(() => readInitialState(), []);
 
-  const [sector, setSector] = useState("Todos");
-  const [range, setRange] = useState([0, 10]);
-  const [search, setSearch] = useState("");
+  const [sector, setSector] = useState<string>(initial?.sector ?? "Todos");
+  const [range, setRange] = useState<[number, number]>(initial?.range ?? [0, 10]);
+  const [search, setSearch] = useState<string>(initial?.search ?? "");
   const [hovered, setHovered] = useState<Occupation | null>(null);
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Occupation | null>(null);
-  const [sortBy, setSortBy] = useState("empleo");
-  const [view, setView] = useState("detailedMap");
+  // Track selection by CNO so that re-loading data in a new language keeps the panel open.
+  const [selectedCno, setSelectedCno] = useState<string | null>(initial?.cno ?? null);
+  const selected = useMemo(() => selectedCno ? OCCUPATIONS_DATA.find(d => d.cno === selectedCno) ?? null : null, [selectedCno, OCCUPATIONS_DATA]);
+  const [sortBy, setSortBy] = useState<string>(initial?.sortBy ?? "empleo");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [view, setView] = useState<string>(initial?.view ?? "detailedMap");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 900, h: 520 });
+
+  // Persist any state change to the URL so language toggles keep the user in place.
+  useEffect(() => {
+    writeStateToUrl({
+      sector, min: range[0], max: range[1], q: search, sort: sortBy, view, cno: selectedCno,
+    });
+  }, [sector, range, search, sortBy, view, selectedCno]);
+
+  // Close detail panel if sector filter changes such that the selected occupation
+  // is no longer part of the filtered set (otherwise the panel shows ghost data).
+  useEffect(() => {
+    if (!selectedCno) return;
+    const item = OCCUPATIONS_DATA.find(d => d.cno === selectedCno);
+    if (!item) { setSelectedCno(null); return; }
+    if (sector !== "Todos" && item.sector !== sector) {
+      setSelectedCno(null);
+    }
+  }, [sector, selectedCno, OCCUPATIONS_DATA]);
 
   useEffect(() => {
     const m = () => {
@@ -132,10 +184,11 @@ function Dashboard({ data }: { data: Occupation[] }) {
 
   const sorted = useMemo(() => {
     if (view !== "list") return [];
+    const sign = sortDir === "desc" ? 1 : -1;
     return [...filtered].sort((a, b) =>
-      sortBy === "score" ? b.score - a.score :
-        sortBy === "salario" ? b.salario - a.salario : b.empleo - a.empleo);
-  }, [filtered, sortBy, view]);
+      sortBy === "score" ? sign * (b.score - a.score) :
+        sortBy === "salario" ? sign * (b.salario - a.salario) : sign * (b.empleo - a.empleo));
+  }, [filtered, sortBy, sortDir, view]);
 
   function renderHistogram() {
     const maxCount = Math.max(1, Math.max(...scoreCounts));
@@ -191,6 +244,9 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <span>{t("histogram.low")}</span>
           <span>{t("histogram.high")}</span>
         </div>
+        <div title={t("histogram.binNote")} style={{ marginTop: 8, fontSize: 9, color: "#bbb", fontStyle: "italic", textAlign: "center", cursor: "help" }}>
+          ⓘ {t("histogram.binNote")}
+        </div>
       </div>
     );
   }
@@ -217,7 +273,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
         <style>{`@keyframes fadeInCard{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}`}</style>
 
         {/* Close button */}
-        <button onClick={() => { setSelected(null); analytics.trackOccupationClose(); }} style={{
+        <button onClick={() => { setSelectedCno(null); analytics.trackOccupationClose(); }} style={{
           position: "absolute", top: 14, right: 14, background: "#f0ece4",
           border: "1px solid #d8d4cc", color: "#888", fontSize: 15, cursor: "pointer",
           borderRadius: "50%", width: 32, height: 32,
@@ -240,7 +296,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           <ScoreBadge score={selected.score} size="lg" />
           <div>
             <div style={{ fontSize: 15, fontWeight: 600, color: getScoreColor(selected.score) }}>
-              {t("detail.exposure")} {getScoreLabel(selected.score)}
+              {t("detail.exposureLabel", { level: getScoreLabel(selected.score) })}
             </div>
             <div style={{ fontSize: 12, color: "#888" }}>{selected.score.toFixed(1)} / 10</div>
             <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("detail.theoreticalCaveat")}</div>
@@ -305,6 +361,11 @@ function Dashboard({ data }: { data: Occupation[] }) {
                   {t("detail.rescored", { from: selected.scoreV9?.toFixed(1), to: selected.score.toFixed(1) })}
                 </span>
               </div>
+              <div style={{ marginTop: 8, fontSize: 9, color: "#aaa", fontStyle: "italic", lineHeight: 1.5 }}>
+                {t("detail.modelFootnote", { method: selected.rescoreMethod ?? "—" })}
+                {" · "}
+                <a href="https://doi.org/10.5281/zenodo.19076797" target="_blank" rel="noopener noreferrer" style={{ color: "#c8633a", textDecoration: "underline" }}>{t("methodology.fullMethodology")}</a>
+              </div>
             </div>
           );
         })()}
@@ -361,16 +422,20 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
         )}
 
-        {/* Interpretación rápida */}
+        {/* Quick interpretation (fully translated via i18n) */}
         <div style={{ marginBottom: 16, padding: "10px 14px", background: "#f9f6f0", borderRadius: 6, borderLeft: `3px solid ${getScoreColor(selected.score)}` }}>
           <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1px", color: "#999", marginBottom: 6, fontWeight: 600 }}>{t("detail.quickInterpretation")}</div>
           <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6 }}>
-            {selected.name} {selected.score >= 7
-              ? (selected.tipo === "replace" ? "muestra alta vulnerabilidad por automatización de tareas centrales." : "presenta vulnerabilidad alta con potencial de aumentación significativo.")
+            {selected.score >= 7
+              ? t(selected.tipo === "replace" ? "detail.quickInterpHighReplace" : "detail.quickInterpHighAugment", { name: selected.name })
               : selected.score >= 5
-              ? "presenta vulnerabilidad moderada: algunas tareas son automatizables, otras requieren juicio humano."
-              : "tiene vulnerabilidad baja a la IA: predominan tareas físicas, relacionales o de alta complejidad no automatizable."}
-            {selected.flagDivergencia && <span style={{ display: "block", marginTop: 4, fontSize: 10, color: "#b08050" }}>⚠ Divergencia &gt;2 pts entre scoring holístico y sub-componentes — interpretar con cautela.</span>}
+              ? t("detail.quickInterpModerate", { name: selected.name })
+              : t("detail.quickInterpLow", { name: selected.name })}
+            {selected.flagDivergencia && (
+              <span style={{ display: "block", marginTop: 4, fontSize: 10, color: "#b08050" }}>
+                {t("detail.divergenceCaveat")}
+              </span>
+            )}
           </div>
         </div>
 
@@ -454,7 +519,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                 fontFamily: F,
               }}
             >
-              📐 Comparativa FUNCAS · r=0,936
+              {t("header.funcasBadge", { r: fmtDecimal(0.936) })}
             </a>
             <LanguageToggle />
           </div>
@@ -478,7 +543,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
           <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
             <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "1.3px", color: "#aaa", marginBottom: 4 }}>{t("stats.employment")}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{t("stats.workers", { count: (stats.te / 1e6).toFixed(1) })}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: S, lineHeight: 1.1, color: "#1a1a1a" }}>{stats.te >= 1e6 ? t("stats.workers", { count: fmtDecimal(stats.te / 1e6, 1) }) : fmtEmployment(stats.te)}</div>
             <div style={{ fontSize: 10, color: "#b08050", marginTop: 2, fontStyle: "italic" }}>{t("stats.employmentMicro")}</div>
           </div>
           <div style={{ padding: "12px 16px", background: "#f0ece4", borderRadius: 6, flex: "1 1 150px", minWidth: 140 }}>
@@ -605,14 +670,23 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </select>
 
           {/* View buttons */}
-          <div style={{ marginLeft: "auto", display: "flex", gap: 3 }}>
+          <div role="tablist" aria-label={t("filters.exposure")} style={{ marginLeft: "auto", display: "flex", gap: 3 }}>
             {(["treemap", "detailedMap", "scatter", "list"] as const).map(m => (
-              <button key={m} onClick={() => {
-                setView(m);
-                setSelected(null);
-                if (m === "detailedMap") setSector("Todos");
-                analytics.trackViewChange(m);
-              }} style={{
+              <button key={m}
+                role="tab"
+                aria-selected={view === m}
+                aria-label={t(
+                  m === "treemap" ? "views.mapAria"
+                  : m === "detailedMap" ? "views.detailAria"
+                  : m === "scatter" ? "views.chartAria"
+                  : "views.listAria"
+                )}
+                onClick={() => {
+                  setView(m);
+                  setSelectedCno(null);
+                  if (m === "detailedMap") setSector("Todos");
+                  analytics.trackViewChange(m);
+                }} style={{
                 padding: "5px 10px", fontSize: 10, fontFamily: F, fontWeight: 600,
                 background: view === m ? "#1a1a1a" : "transparent",
                 color: view === m ? "#faf8f4" : "#aaa",
@@ -660,7 +734,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                         setHoveredGroup(null);
                         analytics.trackSectorGroupClick(r.sector);
                       } else {
-                        setSelected(r);
+                        setSelectedCno(r.cno);
                         setHovered(null);
                         analytics.trackOccupationSelect(r.cno, r.name, "treemap");
                       }
@@ -763,7 +837,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                           style={{ transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)", cursor: "pointer" }}
                           onMouseEnter={() => { setHovered(child); setHoveredGroup(group.sector); }}
                           onMouseLeave={() => { setHovered(null); }}
-                          onClick={() => { setSelected(child); setHovered(null); analytics.trackOccupationSelect(child.cno, child.name, "detailedMap"); }}
+                          onClick={() => { setSelectedCno(child.cno); setHovered(null); analytics.trackOccupationSelect(child.cno, child.name, "detailedMap"); }}
                         />
                       ))}
                     </g>
@@ -840,7 +914,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                   return (
                     <g key={s}>
                       <line x1={x} y1={0} x2={x} y2={plotHeight} stroke="#e0dcd4" strokeDasharray="4 4" />
-                      <text x={x} y={plotHeight + 20} fontSize="10" fill="#aaa" textAnchor="middle">{s}</text>
+                      <text x={x} y={plotHeight + 20} fontSize="10" fill="#aaa" textAnchor="middle">{t("scatter2.vulnTick", { value: s })}</text>
                     </g>
                   );
                 })}
@@ -871,7 +945,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                       stroke={isH ? "#1a1a1a" : "#fff"} strokeWidth={isH ? 2 : 0.5}
                       style={{ transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)", cursor: "pointer" }}
                       onMouseEnter={() => setHovered(d)} onMouseLeave={() => setHovered(null)}
-                      onClick={() => { setSelected(d); setHovered(null); analytics.trackOccupationSelect(d.cno, d.name, "scatter"); }}
+                      onClick={() => { setSelectedCno(d.cno); setHovered(null); analytics.trackOccupationSelect(d.cno, d.name, "scatter"); }}
                     />
                   );
                 })}
@@ -889,17 +963,33 @@ function Dashboard({ data }: { data: Occupation[] }) {
       {!selected && view === "list" && (
         <div style={{ padding: "0 24px 32px", maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-            {[{ k: "score", l: t("list.exposure") }, { k: "empleo", l: t("list.employment") }, { k: "salario", l: t("list.salary") }].map(s => (
-              <button key={s.k} onClick={() => { setSortBy(s.k); analytics.trackSort(s.k); }} style={{
-                padding: "4px 12px", fontSize: 10, fontFamily: F, fontWeight: 600,
-                background: sortBy === s.k ? "#1a1a1a" : "transparent",
-                color: sortBy === s.k ? "#faf8f4" : "#aaa",
-                border: `1px solid ${sortBy === s.k ? "#1a1a1a" : "#ddd"}`,
-                borderRadius: 4, cursor: "pointer", textTransform: "uppercase"
-              }}>
-                {s.l}
-              </button>
-            ))}
+            {[{ k: "score", l: t("list.exposure") }, { k: "empleo", l: t("list.employment") }, { k: "salario", l: t("list.salary") }].map(s => {
+              const active = sortBy === s.k;
+              return (
+                <button key={s.k}
+                  aria-pressed={active}
+                  aria-label={`${s.l} — ${sortDir === "desc" ? t("list2.sortDesc") : t("list2.sortAsc")}`}
+                  onClick={() => {
+                    if (active) {
+                      setSortDir(d => d === "desc" ? "asc" : "desc");
+                    } else {
+                      setSortBy(s.k);
+                      setSortDir("desc");
+                    }
+                    analytics.trackSort(s.k);
+                  }} style={{
+                  padding: "4px 12px", fontSize: 10, fontFamily: F, fontWeight: 600,
+                  background: active ? "#1a1a1a" : "transparent",
+                  color: active ? "#faf8f4" : "#aaa",
+                  border: `1px solid ${active ? "#1a1a1a" : "#ddd"}`,
+                  borderRadius: 4, cursor: "pointer", textTransform: "uppercase",
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                }}>
+                  <span>{s.l}</span>
+                  {active && <span aria-hidden="true">{sortDir === "desc" ? t("list2.sortDesc") : t("list2.sortAsc")}</span>}
+                </button>
+              );
+            })}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <div style={{
@@ -920,7 +1010,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                 borderRadius: 4, cursor: "pointer", alignItems: "center",
                 transition: "background 0.12s"
               }}
-                onClick={() => { setSelected(item); analytics.trackOccupationSelect(item.cno, item.name, "list"); }}
+                onClick={() => { setSelectedCno(item.cno); analytics.trackOccupationSelect(item.cno, item.name, "list"); }}
                 onMouseEnter={e => (e.currentTarget.style.background = "#ede8e0")}
                 onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "#f5f1eb" : "transparent")}>
                 <ScoreBadge score={item.score} />
@@ -1044,7 +1134,9 @@ export default function Index() {
   const lang = i18n.language;
 
   useEffect(() => {
-    setData(null);
+    // Do NOT clear `data` here: clearing would unmount Dashboard and wipe its state
+    // (sector, range, search, selection, …) on every language toggle. Keep the old
+    // dataset on screen while the new one loads.
     const file = lang === "en" ? "/data/spain_502_v15_subcomp_complete_en.json" : "/data/spain_502_v15_subcomp_complete.json";
     fetch(file)
       .then(r => { if (!r.ok) throw new Error("Failed to load data"); return r.json(); })

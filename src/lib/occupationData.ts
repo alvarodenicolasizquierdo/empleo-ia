@@ -62,6 +62,7 @@ export interface Occupation {
   items?: Occupation[];
   // rescore sub-components
   scoreV9?: number;
+  rescoreMethod?: string;
   rescoreCluster?: string;
   rescoreD?: number;
   rescoreC?: number;
@@ -148,6 +149,23 @@ const getLocale = () => i18n.language === "en" ? "en-US" : "es-ES";
 export const fmt = (n: number) => Math.round(n).toLocaleString(getLocale());
 export const fmtE = (n: number) => Math.round(n).toLocaleString(getLocale()) + " \u20AC";
 
+// Adaptive employment formatter: < 1k \u2192 exact, < 1M \u2192 K, \u2265 1M \u2192 M
+// Locale-aware (uses Intl so decimal separator matches the active language).
+export const fmtEmployment = (n: number): string => {
+  const locale = getLocale();
+  if (n >= 1e6) {
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 }).format(n / 1e6) + "M";
+  }
+  if (n >= 1e3) {
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(n / 1e3) + "K";
+  }
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(n);
+};
+
+// Locale-aware decimal number formatter (e.g. r values, kappa).
+export const fmtDecimal = (n: number, digits = 3): string =>
+  new Intl.NumberFormat(getLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+
 export const parseOccupation = (d: RawOccupation): Occupation => ({
   cno: d.cno,
   name: d.nombre,
@@ -160,6 +178,7 @@ export const parseOccupation = (d: RawOccupation): Occupation => ({
   vector: d.justificacion,
   ...(d.rescore_D != null && {
     scoreV9: d.score_v9,
+    rescoreMethod: d.rescore_method,
     rescoreCluster: d.rescore_cluster,
     rescoreD: d.rescore_D,
     rescoreC: d.rescore_C,

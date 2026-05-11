@@ -2,7 +2,8 @@
   "header": {
     "subtitle": "Labour vulnerability to AI · Spain 2026 · 502 CNO-11 occupations · LFS Q4 2025 · Census 2021",
     "title": "Job Vulnerability to Artificial Intelligence in Spain",
-    "description": "Analysis of 502 occupations in the Spanish labour market by their degree of AI vulnerability. Data INE/LFS Q4 2025 · Census 2021 weights · Scores calibrated with 5 Spain-specific structural factors (DESI 2023, labour protection, EU AI Act Annex III, AESIA)."
+    "description": "Analysis of 502 occupations in the Spanish labour market by their degree of AI vulnerability. Data INE/LFS Q4 2025 · Census 2021 weights · Scores calibrated with 5 Spain-specific structural factors (DESI 2023, labour protection, EU AI Act Annex III, AESIA).",
+    "funcasBadge": "📐 FUNCAS validation · r = {{r}}"
   },
   "stats": {
     "occupations": "Occupations",
@@ -37,7 +38,11 @@
     "map": "Map",
     "detail": "Detail",
     "chart": "Chart",
-    "list": "List"
+    "list": "List",
+    "mapAria": "Switch to map (sector treemap) view",
+    "detailAria": "Switch to detailed map (occupation-level) view",
+    "chartAria": "Switch to chart (salary × vulnerability) view",
+    "listAria": "Switch to list view"
   },
   "treemap": {
     "score": "Score",
@@ -85,6 +90,7 @@
     "employees": "Employees",
     "avgSalary": "Average salary",
     "exposure": "Vulnerability",
+    "exposureLabel": "{{level}} vulnerability",
     "theoreticalCaveat": "Theoretical vulnerability, not automatic displacement",
     "automationVector": "Automation vector",
     "wageIndex": "Theoretical conc. index",
@@ -98,15 +104,21 @@
     "confidenceA": "A — Census 2021 + SEPE (good estimate)",
     "confidenceB": "B — SEPE synthetic estimate (dependent on proportional weights)",
     "quickInterpretation": "Quick interpretation",
+    "quickInterpHighReplace": "{{name}} shows high vulnerability driven by automation of core tasks.",
+    "quickInterpHighAugment": "{{name}} shows high vulnerability with significant augmentation potential.",
+    "quickInterpModerate": "{{name}} shows moderate vulnerability: some tasks are automatable, others require human judgement.",
+    "quickInterpLow": "{{name}} has low AI vulnerability: physical, relational or highly complex tasks dominate.",
+    "divergenceCaveat": "⚠ More than 2 pt gap between this occupation's holistic LLM score and its D/C/F/R-derived score — interpret with caution.",
     "reliability": "Inter-model validation:",
-    "reliabilityText": "100% coverage (502/502 occupations). Rescaled: r = 0.953 (κ<sub>w</sub> = 0.667). Informative: r = 0.802. D/C/F/R available for all occupations.",
+    "reliabilityText": "100% coverage (502/502 occupations). <strong>Sub-component coherence:</strong> r = 0.953 (177 rescaled) · r = 0.802 (325 informative). <strong>Holistic agreement:</strong> κ<sub>w</sub> = 0.667 (Landis-Koch substantial). Independent experiments — not directly comparable.",
     "subComponents": "D/C/F/R sub-component analysis",
     "displacementPotential": "D — Displacement potential",
     "complexity": "C — Task complexity",
-    "feasibilityBarriers": "F — Feasibility barriers",
-    "regulatoryProtection": "R — Regulatory protection",
+    "feasibilityBarriers": "F — Physical barrier",
+    "regulatoryProtection": "R — Regulatory friction",
     "rescoreFormula": "Formula",
     "rescored": "Rescored: {{from}} → {{to}}",
+    "modelFootnote": "Rescore method: {{method}} · Evaluator: Gemini 2.5 Pro · Cutoff: LFS Q4 2025 · Methodology v30",
     "share": "SHARE",
     "copied": "Copied!",
     "copy": "Copy",
@@ -149,7 +161,7 @@
     "internationalTitle": "International comparison:",
     "internationalText": "The OECD estimates 28% of jobs at risk of automation in Spain, but that figure includes all technologies (robotics, traditional software, AI). The OECD AI-specific figure for Spain is 5.9% high risk (traditional automation) or 27.4% exposure to generative AI (different construct). Our 12.1% measures theoretical AI vulnerability calibrated with Spain-specific structural factors (47 occupations, 22.73M workers).",
     "llmTitle": "LLM scoring and inter-model validation:",
-    "llmText": "Scores generated with Gemini 2.5 Pro (T=0.2) and validated with GPT-4o (100 holistic) + GPT 5.4 and Gemini 3 (D/C/F/R sub-components). 100% coverage (502/502 occupations): 177 rescaled (r = 0.953) + 325 informative (r = 0.802). κ<sub>w</sub> = 0.667 (substantial agreement, Landis-Koch). 158 occupations with divergence >2.0 points documented in notes [21] and [47]. Prompts, scripts and raw data published on Zenodo (DOI 10.5281/zenodo.19165098).",
+    "llmText": "Scores generated with Gemini 2.5 Pro (T=0.2). Two independent validation experiments, not directly comparable: <strong>(i) Sub-component coherence against FUNCAS panel</strong> — r = 0.953 (177 rescaled) and r = 0.802 (325 informative); <strong>(ii) Holistic agreement on the aggregate score</strong> — κ<sub>w</sub> = 0.667 (Landis-Koch substantial). Validators: GPT-4o (100 holistic) and GPT 5.4 + Gemini 3 (D/C/F/R sub-components). 158 occupations show >2.0 pt divergence between holistic and sub-component scoring (documented in notes [21] and [47]). Prompts, scripts and raw data on Zenodo (DOI 10.5281/zenodo.19165098).",
     "fullMethodology": "Full methodology (57 technical notes) →",
     "noteTitle": "Note:",
     "noteText": "Scores are theoretical vulnerability estimates, not predictions of job displacement. Empirical evidence (Anthropic, February 2026) shows theoretical vulnerability can differ significantly from actual adoption (94% theoretical vs 33% observed in computing/mathematical occupations). Apply a 70-80% discount to estimate current impact. Full methodology with 57 technical notes available on Zenodo."
@@ -165,7 +177,7 @@
     "salaryTitle": "Salaries",
     "salaryText": "WSS 2023 (INE). 128 unique values (INE publishes at 2-digit CNO). Validated MAPE: 4.96%. Temporal deflator not applied (CPI +10% 2022→2025) to maintain MAPE validation coherence.",
     "scoresTitle": "Vulnerability scores",
-    "scoresText": "Generated with LLMs, 100% inter-model validated. 158 occupations with divergence >2 points between holistic and sub-component scoring — documented in notes [21] and [47].",
+    "scoresText": "Generated with LLMs. Two independent validation experiments: sub-component coherence vs FUNCAS (r = 0.953 / 0.802) and holistic agreement (κw = 0.667, Landis-Koch substantial). Not directly comparable. 158 occupations with internal divergence >2 pts documented in notes [21] and [47].",
     "euAiActTitle": "EU AI Act in this context",
     "euAiActText": "The EU AI Act classification (Regulation 2024/1689, Annex III) classifies AI systems by use case, not occupations. 'High risk' means AI system deployment in that context requires strict compliance. It does not equate to labour risk or automation probability.",
     "sourcesTitle": "Sources",
@@ -180,7 +192,16 @@
     "scale": "Scale 0 (minimum) → 10 (maximum)",
     "methodologyPdf": "View details on Zenodo",
     "low": "← Low vulnerability",
-    "high": "High vulnerability →"
+    "high": "High vulnerability →",
+    "binNote": "Scores are rounded to the nearest integer to assign the bin; the slider uses inclusive bounds."
+  },
+  "scatter2": {
+    "salaryTick": "{{value}} €",
+    "vulnTick": "{{value}}/10"
+  },
+  "list2": {
+    "sortAsc": "▲",
+    "sortDesc": "▼"
   },
   "loading": "Loading data...",
   "error": "Error",

@@ -2,7 +2,8 @@
   "header": {
     "subtitle": "Vulnerabilidad laboral a la IA · España 2026 · 502 ocupaciones CNO-11 · EPA Q4 2025 · Censo 2021",
     "title": "Vulnerabilidad de Empleos a la Inteligencia Artificial en España",
-    "description": "Análisis de las 502 ocupaciones del mercado laboral español según su grado de vulnerabilidad a la IA. Datos INE/EPA Q4 2025 · Ponderaciones Censo 2021 · Puntuaciones calibradas con 5 factores estructurales España (DESI 2023, protección laboral, EU AI Act Anexo III, AESIA)."
+    "description": "Análisis de las 502 ocupaciones del mercado laboral español según su grado de vulnerabilidad a la IA. Datos INE/EPA Q4 2025 · Ponderaciones Censo 2021 · Puntuaciones calibradas con 5 factores estructurales España (DESI 2023, protección laboral, EU AI Act Anexo III, AESIA).",
+    "funcasBadge": "📐 Validación FUNCAS · r = {{r}}"
   },
   "stats": {
     "occupations": "Ocupaciones",
@@ -37,7 +38,11 @@
     "map": "Mapa",
     "detail": "Detalle",
     "chart": "Gráfico",
-    "list": "Lista"
+    "list": "Lista",
+    "mapAria": "Cambiar a vista mapa (treemap por sector)",
+    "detailAria": "Cambiar a vista mapa detallado (por ocupación)",
+    "chartAria": "Cambiar a vista gráfico (salario × vulnerabilidad)",
+    "listAria": "Cambiar a vista lista"
   },
   "treemap": {
     "score": "Score",
@@ -85,6 +90,7 @@
     "employees": "Empleados",
     "avgSalary": "Salario medio",
     "exposure": "Vulnerabilidad",
+    "exposureLabel": "Vulnerabilidad {{level}}",
     "theoreticalCaveat": "Vulnerabilidad teórica, no desplazamiento automático",
     "automationVector": "Vector de automatización",
     "wageIndex": "Índice teórico conc. salarial",
@@ -98,15 +104,21 @@
     "confidenceA": "A — Censo 2021 + SEPE (buena estimación)",
     "confidenceB": "B — Estimación sintética SEPE (dependiente de pesos proporcionales)",
     "quickInterpretation": "Interpretación rápida",
+    "quickInterpHighReplace": "{{name}} muestra alta vulnerabilidad por automatización de tareas centrales.",
+    "quickInterpHighAugment": "{{name}} presenta vulnerabilidad alta con potencial de aumentación significativo.",
+    "quickInterpModerate": "{{name}} presenta vulnerabilidad moderada: algunas tareas son automatizables, otras requieren juicio humano.",
+    "quickInterpLow": "{{name}} tiene vulnerabilidad baja a la IA: predominan tareas físicas, relacionales o de alta complejidad no automatizable.",
+    "divergenceCaveat": "⚠ Diferencia >2 pts entre la puntuación holística del LLM y la derivada de sub-componentes D/C/F/R para esta ocupación — interpretar con cautela.",
     "reliability": "Validación inter-modelo:",
-    "reliabilityText": "100% cobertura (502/502 ocupaciones). Rescalados: r = 0,953 (κ<sub>w</sub> = 0,667). Informativos: r = 0,802. D/C/F/R disponible para todas las ocupaciones.",
+    "reliabilityText": "100% cobertura (502/502 ocupaciones). <strong>Coherencia sub-componente:</strong> r = 0,953 (177 rescaladas) · r = 0,802 (325 informativas). <strong>Concordancia holística:</strong> κ<sub>w</sub> = 0,667 (Landis-Koch sustancial). Experimentos independientes — no directamente comparables.",
     "subComponents": "Análisis sub-componentes D/C/F/R",
     "displacementPotential": "D — Potencial de desplazamiento",
     "complexity": "C — Complejidad de tareas",
-    "feasibilityBarriers": "F — Barreras de viabilidad",
-    "regulatoryProtection": "R — Protección regulatoria",
+    "feasibilityBarriers": "F — Barrera física",
+    "regulatoryProtection": "R — Fricción regulatoria",
     "rescoreFormula": "Fórmula",
     "rescored": "Rescored: {{from}} → {{to}}",
+    "modelFootnote": "Método de re-scoring: {{method}} · Evaluador: Gemini 2.5 Pro · Corte: EPA Q4 2025 · Metodología v30",
     "share": "COMPARTIR",
     "copied": "Copiado!",
     "copy": "Copiar",
@@ -149,7 +161,7 @@
     "internationalTitle": "Comparativa internacional:",
     "internationalText": "La OCDE estima un 28% de empleos en riesgo de automatización en España, pero esa cifra incluye todas las tecnologías (robótica, software tradicional, IA). La cifra OCDE específica de IA para España es un 5,9% de alto riesgo (automatización tradicional) o 27,4% de exposición a IA generativa (constructo diferente). Nuestro 12,1% mide vulnerabilidad teórica a IA calibrada con factores estructurales España (47 ocupaciones, 22,73M empleados).",
     "llmTitle": "Puntuación LLM y validación inter-modelo:",
-    "llmText": "Puntuaciones generadas con Gemini 2.5 Pro (T=0,2) y validadas con GPT-4o (100 holísticas) + GPT 5.4 y Gemini 3 (sub-componentes D/C/F/R). Cobertura 100% (502/502 ocupaciones): 177 rescaladas (r = 0,953) + 325 informativas (r = 0,802). κ<sub>w</sub> = 0,667 (acuerdo sustancial, Landis-Koch). 158 ocupaciones con divergencia >2,0 puntos (97% en dirección fórmula < holístico) documentadas. Prompts, scripts y datos brutos publicados en Zenodo (DOI 10.5281/zenodo.19165098).",
+    "llmText": "Puntuaciones generadas con Gemini 2.5 Pro (T=0,2). Dos experimentos de validación independientes, no directamente comparables: <strong>(i) Coherencia de sub-componentes frente al panel FUNCAS</strong> — r = 0,953 (177 rescaladas) y r = 0,802 (325 informativas); <strong>(ii) Concordancia holística sobre la puntuación agregada</strong> — κ<sub>w</sub> = 0,667 (acuerdo sustancial Landis-Koch). Validadores: GPT-4o (100 holísticas) y GPT 5.4 + Gemini 3 (sub-componentes D/C/F/R). 158 ocupaciones presentan divergencia >2,0 pts entre puntuación holística y por sub-componentes (notas [21] y [47]). Prompts, scripts y datos brutos en Zenodo (DOI 10.5281/zenodo.19165098).",
     "fullMethodology": "Metodología completa (57 notas técnicas) →",
     "noteTitle": "Nota:",
     "noteText": "Las puntuaciones son estimaciones de vulnerabilidad teórica, no predicciones de desplazamiento laboral. La evidencia empírica (Anthropic, febrero 2026) muestra que la vulnerabilidad teórica puede diferir significativamente de la adopción real (94% teórico vs 33% observado en ocupaciones informáticas/matemáticas). Aplicar un descuento del 70-80% para estimar el impacto actual. Metodología completa con 57 notas técnicas disponible en Zenodo."
@@ -165,7 +177,7 @@
     "salaryTitle": "Salarios",
     "salaryText": "EES 2023 (INE). 128 valores únicos (INE publica a 2 dígitos CNO). MAPE validado: 4,96%. Deflactor temporal no aplicado (CPI +10% 2022→2025) para mantener coherencia con validación MAPE.",
     "scoresTitle": "Puntuaciones de vulnerabilidad",
-    "scoresText": "Generadas con LLMs, validadas inter-modelo al 100%. 158 ocupaciones con divergencia >2 puntos entre scoring holístico y por sub-componentes — documentado en notas [21] y [47].",
+    "scoresText": "Generadas con LLMs. Dos experimentos de validación independientes: coherencia de sub-componentes vs FUNCAS (r = 0,953 / 0,802) y concordancia holística (κw = 0,667, Landis-Koch sustancial). No directamente comparables. 158 ocupaciones con divergencia interna >2 pts en notas [21] y [47].",
     "euAiActTitle": "EU AI Act en este contexto",
     "euAiActText": "La clasificación EU AI Act (Reglamento 2024/1689, Anexo III) clasifica sistemas de IA por caso de uso, no ocupaciones. 'Alto riesgo' indica que el despliegue de sistemas de IA en ese contexto requiere cumplimiento estricto. No equivale a riesgo laboral ni a probabilidad de automatización.",
     "sourcesTitle": "Fuentes",
@@ -180,7 +192,16 @@
     "scale": "Escala 0 (mínima) → 10 (máxima)",
     "methodologyPdf": "Ver detalle en Zenodo",
     "low": "← Baja vulnerabilidad",
-    "high": "Alta vulnerabilidad →"
+    "high": "Alta vulnerabilidad →",
+    "binNote": "Las puntuaciones se redondean al entero más próximo para asignar la barra; el slider usa límites inclusivos."
+  },
+  "scatter2": {
+    "salaryTick": "{{value}} €",
+    "vulnTick": "{{value}}/10"
+  },
+  "list2": {
+    "sortAsc": "▲",
+    "sortDesc": "▼"
   },
   "loading": "Cargando datos...",
   "error": "Error",
