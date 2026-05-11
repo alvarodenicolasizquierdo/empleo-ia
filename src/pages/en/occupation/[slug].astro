@@ -1,33 +1,34 @@
 ---
-import Base from "../../layouts/Base.astro";
-import OccupationDetailPage from "../../components/astro/OccupationDetailPage.astro";
-import { loadAllOccupations, occupationSlug, occupationSlugFor } from "@/data/loadOccupations";
+import Base from "../../../layouts/Base.astro";
+import OccupationDetailPage from "../../../components/astro/OccupationDetailPage.astro";
+import { loadAllOccupations, occupationSlugFor } from "@/data/loadOccupations";
 import { strings, sectorLabel } from "@/i18n/static";
 
-const lang = "es";
+const lang = "en";
 const t = strings(lang);
-const localeStr = "es-ES";
+const localeStr = "en-US";
 
 export async function getStaticPaths() {
   const { es, enByCno } = loadAllOccupations();
   return es.map((occ) => ({
-    params: { slug: occupationSlug(occ) },
+    params: { slug: occupationSlugFor(occ, enByCno.get(occ.cno), "en") },
     props: {
       occ,
       en: enByCno.get(occ.cno)!,
-      altSlug: occupationSlugFor(occ, enByCno.get(occ.cno), "en"),
+      altSlug: occupationSlugFor(occ, enByCno.get(occ.cno), "es"),
     },
   }));
 }
 
 const { occ, en, altSlug } = Astro.props;
 const score = occ.vulnerabilidad_ia_score;
-const scoreFmt = score.toString().replace(".", ",");
+const scoreFmt = score.toString();
 const sectorName = sectorLabel(occ.sector, lang);
+const occName = en.nombre;
 
-const title = `${occ.nombre} ${t.occupation.titleSuffix(scoreFmt)}`;
+const title = `${occName} ${t.occupation.titleSuffix(scoreFmt)}`;
 const description = t.occupation.description(
-  occ.nombre, occ.cno, scoreFmt,
+  occName, occ.cno, scoreFmt,
   occ.empleo.toLocaleString(localeStr),
   occ.salario_medio_eur.toLocaleString(localeStr),
   sectorName,
@@ -36,14 +37,14 @@ const description = t.occupation.description(
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Occupation",
-  "name": occ.nombre,
-  "alternateName": en.nombre,
+  "name": occName,
+  "alternateName": occ.nombre,
   "occupationalCategory": `CNO-11:${occ.cno}`,
-  "description": occ.justificacion,
+  "description": en.justificacion,
   "inLanguage": lang,
   "estimatedSalary": {
     "@type": "MonetaryAmountDistribution",
-    "name": "Salario medio anual",
+    "name": "Average annual salary",
     "currency": "EUR",
     "median": occ.salario_medio_eur,
   },
@@ -52,6 +53,6 @@ const jsonLd = {
 };
 ---
 
-<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref={`/en/occupation/${altSlug}`}>
+<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref={`/ocupacion/${altSlug}`}>
   <OccupationDetailPage occ={occ} en={en} lang={lang} />
 </Base>

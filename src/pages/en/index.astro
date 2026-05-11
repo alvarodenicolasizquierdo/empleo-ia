@@ -1,13 +1,13 @@
 ---
-import Base from "../layouts/Base.astro";
-import DashboardIsland from "../components/react/DashboardIsland";
-import OccupationTable from "../components/astro/OccupationTable.astro";
-import SectorSummary from "../components/astro/SectorSummary.astro";
-import ThresholdCurve from "../components/astro/ThresholdCurve.astro";
-import { loadAllOccupations, getSectorStats, getAggregateStats, generateDatasetJsonLd, generateFaqJsonLd } from "../data/loadOccupations";
-import { strings } from "../i18n/static";
+import Base from "../../layouts/Base.astro";
+import DashboardIsland from "../../components/react/DashboardIsland";
+import OccupationTable from "../../components/astro/OccupationTable.astro";
+import SectorSummary from "../../components/astro/SectorSummary.astro";
+import ThresholdCurve from "../../components/astro/ThresholdCurve.astro";
+import { loadAllOccupations, getSectorStats, getAggregateStats, generateDatasetJsonLd, generateFaqJsonLd } from "../../data/loadOccupations";
+import { strings } from "../../i18n/static";
 
-const lang = "es";
+const lang = "en";
 const t = strings(lang);
 const { es, en } = loadAllOccupations();
 const sectors = getSectorStats(es);
@@ -17,10 +17,10 @@ const enByCno = new Map(en.map((d) => [d.cno, d]));
 const faqJsonLd = generateFaqJsonLd(es, lang, enByCno);
 
 const title = t.common.indexTitle;
-const description = t.home.description(es.length, stats.totalEmployment.toLocaleString("es-ES"));
+const description = t.home.description(es.length, stats.totalEmployment.toLocaleString("en-US"));
 ---
 
-<Base title={title} description={description} jsonLd={[datasetJsonLd, faqJsonLd]} lang={lang} altLangHref="/en/">
+<Base title={title} description={description} jsonLd={[datasetJsonLd, faqJsonLd]} lang={lang} altLangHref="/">
   <!-- React Dashboard island — interactive, hydrated client-side -->
   <DashboardIsland client:load />
 
@@ -28,7 +28,7 @@ const description = t.home.description(es.length, stats.totalEmployment.toLocale
   <nav style="max-width:1200px;margin:0 auto;padding:16px 24px;font-family:'DM Sans',sans-serif;">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 18px;background:#f0ece4;border-radius:8px;border:1px solid #e0dcd4;">
       <span style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#999;font-weight:600;margin-right:4px;">{t.common.explore}</span>
-      <a href="/sector/" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:#1a1a1a;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
+      <a href="/en/sector/" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:#1a1a1a;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
         {t.home.seeAllSectors(sectors.length)}
       </a>
       <a href="/comparativa-funcas.html" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:11px;font-weight:600;background:#5a7048;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">

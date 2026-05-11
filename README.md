@@ -81,7 +81,15 @@ Tabla completa con score, nombre, sector, empleados, salario y clasificacion EU 
 - Indice de masa salarial x exposicion
 - Botones de compartir (X, LinkedIn, WhatsApp, email, copiar)
 
-**Bilingue (ES/EN)** con react-i18next: cambia el idioma sin perder el estado (vista, filtro de sector, rango del slider, busqueda, ordenacion y panel abierto). Los valores internos del sector se mantienen en español canonico, asi que los deep-links (`?sector=...&min=...&max=...&q=...&sort=...&view=...&cno=...`) son estables entre idiomas.
+**Bilingue (ES/EN) real** — rutas server-rendered separadas, no solo toggle client-side:
+
+- `/` (es) ↔ `/en/`
+- `/sector/` (es) ↔ `/en/sector/`
+- `/sector/{slug-es}` ↔ `/en/sector/{slug-en}` (12 sectores en cada idioma)
+- `/ocupacion/{slug-es}` ↔ `/en/occupation/{slug-en}` (502 ocupaciones en cada idioma)
+- `/404` ↔ `/en/404`
+
+Cada par espejo emite `<html lang>`, `<title>`, `<meta description>`, `og:locale`, `og:title`/`description`, `twitter:title`/`description`, JSON-LD (`@inLanguage`) y `hreflang` real apuntando al otro espejo. El toggle del dashboard navega al espejo conservando query string + hash (los deep-links `?sector=...&min=...&max=...&q=...&sort=...&view=...&cno=...` sobreviven al cambio de idioma porque el valor interno de sector se mantiene en español canonico).
 
 ---
 

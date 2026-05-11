@@ -1,15 +1,15 @@
 ---
-import Base from "../layouts/Base.astro";
-import { strings } from "../i18n/static";
+import Base from "../../layouts/Base.astro";
+import { strings } from "../../i18n/static";
 
-const t = strings("es");
+const t = strings("en");
 ---
 
-<Base title={t.notFound.title} description={t.notFound.description} noindex={true} lang="es" altLangHref="/en/404">
+<Base title={t.notFound.title} description={t.notFound.description} noindex={true} lang="en" altLangHref="/404">
   <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Sans',system-ui,sans-serif;background:#faf8f4;color:#1a1a1a;">
     <h1 style="font-size:48px;font-family:'Cormorant Garamond',serif;font-weight:600;margin:0 0 8px;">404</h1>
     <p style="font-size:14px;color:#888;margin:0 0 24px;">{t.notFound.description}</p>
-    <a href="/" style="padding:7px 14px;font-size:11px;font-weight:600;background:#1a1a1a;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
+    <a href="/en/" style="padding:7px 14px;font-size:11px;font-weight:600;background:#1a1a1a;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
       {t.common.backHome}
     </a>
   </div>

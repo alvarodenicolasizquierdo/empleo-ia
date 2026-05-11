@@ -1,19 +1,19 @@
 ---
-import Base from "../../layouts/Base.astro";
-import SectorDetailPage from "../../components/astro/SectorDetailPage.astro";
+import Base from "../../../layouts/Base.astro";
+import SectorDetailPage from "../../../components/astro/SectorDetailPage.astro";
 import { loadAllOccupations, getSectorStats, sectorSlugFor, occupationSlugFor } from "@/data/loadOccupations";
 import { strings, sectorLabel } from "@/i18n/static";
 
-const lang = "es";
+const lang = "en";
 const t = strings(lang);
-const localeStr = "es-ES";
+const localeStr = "en-US";
 
 export async function getStaticPaths() {
   const { es } = loadAllOccupations();
   const sectors = getSectorStats(es);
   return sectors.map((s) => ({
-    params: { slug: sectorSlugFor(s.sector, "es") },
-    props: { sector: s, altSlug: sectorSlugFor(s.sector, "en") },
+    params: { slug: sectorSlugFor(s.sector, "en") },
+    props: { sector: s, altSlug: sectorSlugFor(s.sector, "es") },
   }));
 }
 
@@ -25,7 +25,7 @@ const sectorName = sectorLabel(sector.sector, lang);
 const BASE_URL = "https://empleo-ai.anlakstudio.com";
 
 const title = `${sectorName} ${t.sectorDetail.titleSuffix}`;
-const description = t.sectorDetail.description(sectorName, sector.count, sector.employment.toLocaleString(localeStr), sector.avgScore.toString().replace(".", ","), sector.highRiskCount);
+const description = t.sectorDetail.description(sectorName, sector.count, sector.employment.toLocaleString(localeStr), sector.avgScore.toString(), sector.highRiskCount);
 
 const sorted = [...sector.occupations].sort((a, b) => b.vulnerabilidad_ia_score - a.vulnerabilidad_ia_score);
 const jsonLd = {
@@ -38,11 +38,11 @@ const jsonLd = {
     "@type": "ListItem",
     "position": i + 1,
     "url": `${BASE_URL}${t.paths.ocupacionPrefix}/${occupationSlugFor(occ, enByCno.get(occ.cno), lang)}`,
-    "name": occ.nombre,
+    "name": enByCno.get(occ.cno)?.nombre ?? occ.nombre,
   })),
 };
 ---
 
-<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref={`/en/sector/${altSlug}`}>
+<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref={`/sector/${altSlug}`}>
   <SectorDetailPage sector={sector} enByCno={enByCno} lang={lang} />
 </Base>

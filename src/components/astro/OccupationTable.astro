@@ -1,70 +1,95 @@
 ---
 import type { RawOccupation } from "@/lib/occupationData";
-import { occupationSlug } from "@/data/loadOccupations";
+import { occupationSlugFor } from "@/data/loadOccupations";
+import { strings, sectorLabel, type Lang } from "@/i18n/static";
 
 interface Props {
   occupations: RawOccupation[];
   enOccupations?: RawOccupation[];
+  lang?: Lang;
 }
 
-const { occupations, enOccupations } = Astro.props;
+const { occupations, enOccupations, lang = "es" } = Astro.props;
+const t = strings(lang);
 const enByCno = enOccupations ? new Map(enOccupations.map((d) => [d.cno, d])) : new Map();
+const localeStr = lang === "en" ? "en-US" : "es-ES";
+const decimalChar = lang === "en" ? "." : ",";
 const totalEmployment = occupations.reduce((s, d) => s + d.empleo, 0);
 const avgScoreUnweighted = +(occupations.reduce((s, d) => s + d.vulnerabilidad_ia_score, 0) / occupations.length).toFixed(2);
 const avgScoreWeighted = +(occupations.reduce((s, d) => s + d.vulnerabilidad_ia_score * d.empleo, 0) / totalEmployment).toFixed(2);
+const occBase = t.paths.ocupacionPrefix;
 
 const F = "'DM Sans', sans-serif";
 const S = "'Cormorant Garamond', serif";
+
+const formatScore = (n: number): string => n.toString().replace(".", decimalChar);
+const displayName = (d: RawOccupation): string => {
+  if (lang === "en") return enByCno.get(d.cno)?.nombre ?? d.nombre;
+  return d.nombre;
+};
+const altName = (d: RawOccupation): string | undefined => {
+  if (lang === "en") return d.nombre; // show Spanish hint when on EN
+  return enByCno.get(d.cno)?.nombre;
+};
+const displayEuAct = (d: RawOccupation): string => {
+  if (lang === "en") return enByCno.get(d.cno)?.eu_ai_act ?? d.eu_ai_act;
+  return d.eu_ai_act;
+};
+const displayTipo = (d: RawOccupation): string => {
+  if (lang === "en") return enByCno.get(d.cno)?.tipo_impacto ?? d.tipo_impacto;
+  return d.tipo_impacto;
+};
 ---
 
 <section id="seo-occupation-table" style={`max-width:1200px;margin:2rem auto;padding:0 24px;font-family:${F};color:#1a1a1a;`}>
   <h2 style={`font-size:clamp(18px,2vw,24px);font-family:${S};font-weight:600;margin-bottom:4px;color:#1a1a1a;`}>
-    {occupations.length} ocupaciones del mercado laboral español: vulnerabilidad a la IA
+    {t.occupationTable.heading(occupations.length)}
   </h2>
   <p style="margin-bottom:4px;font-size:14px;color:#1a1a1a;font-weight:600;">
-    Score medio ponderado por empleo: <span style="color:#c8633a;">{avgScoreWeighted.toString().replace(".", ",")}/10</span>
+    {t.occupationTable.weightedHeading} <span style="color:#c8633a;">{formatScore(avgScoreWeighted)}/10</span>
   </p>
   <p style="margin-bottom:12px;font-size:12px;color:#888;">
-    Datos: EPA Q4 2025, INE Census 2021, SEPE 2024 · Metodología v30 · Dataset v15 · {totalEmployment.toLocaleString("es-ES")} trabajadores · Score medio (no ponderado): {avgScoreUnweighted.toString().replace(".", ",")}/10
+    {t.occupationTable.metaLine(occupations.length, totalEmployment.toLocaleString(localeStr), formatScore(avgScoreUnweighted))}
   </p>
   <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:11px;line-height:1.4;">
       <caption style="text-align:left;padding:0.5rem 0;font-size:11px;color:#999;">
-        Análisis de vulnerabilidad a la inteligencia artificial de las {occupations.length} ocupaciones CNO-11 del mercado laboral español. Puntuación 0 (mínima vulnerabilidad) a 10 (máxima vulnerabilidad).
+        {t.occupationTable.caption(occupations.length)}
       </caption>
       <thead>
         <tr style="border-bottom:2px solid #e0dcd4;text-align:left;">
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">CNO</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Ocupación</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Sector</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Empleo</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Salario medio</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Score IA</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">EU AI Act</th>
-          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">Tipo impacto</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colCno}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colOccupation}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colSector}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colEmployment}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colSalary}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colScore}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colEuAct}</th>
+          <th scope="col" style="padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:600;">{t.occupationTable.colImpact}</th>
         </tr>
       </thead>
       <tbody>
         {occupations.map((d, i) => {
-          const en = enByCno.get(d.cno);
-          const slug = occupationSlug(d);
+          const enOcc = enByCno.get(d.cno);
+          const slug = occupationSlugFor(d, enOcc, lang);
+          const alt = altName(d);
           return (
             <tr style={`border-bottom:1px solid #f0ece4;${i % 2 === 0 ? "background:#f5f1eb;" : ""}`}>
               <td style="padding:4px 8px;">
-                <a href={`/ocupacion/${slug}`} style="color:#c8633a;text-decoration:none;font-weight:600;">{d.cno}</a>
+                <a href={`${occBase}/${slug}`} style="color:#c8633a;text-decoration:none;font-weight:600;">{d.cno}</a>
               </td>
               <td style="padding:4px 8px;">
-                <a href={`/ocupacion/${slug}`} style="color:#1a1a1a;text-decoration:none;">
-                  {d.nombre}
-                  {en && <small style="color:#bbb;"> ({en.nombre})</small>}
+                <a href={`${occBase}/${slug}`} style="color:#1a1a1a;text-decoration:none;">
+                  {displayName(d)}
+                  {alt && <small style="color:#bbb;"> ({alt})</small>}
                 </a>
               </td>
-              <td style="padding:4px 8px;color:#888;">{d.sector}</td>
-              <td style="padding:4px 8px;color:#555;font-variant-numeric:tabular-nums;">{d.empleo.toLocaleString("es-ES")}</td>
-              <td style="padding:4px 8px;color:#555;font-variant-numeric:tabular-nums;">{d.salario_medio_eur.toLocaleString("es-ES")} €</td>
-              <td style="padding:4px 8px;font-weight:600;color:#1a1a1a;">{d.vulnerabilidad_ia_score}</td>
-              <td style="padding:4px 8px;color:#888;">{d.eu_ai_act}</td>
-              <td style="padding:4px 8px;color:#888;">{d.tipo_impacto}</td>
+              <td style="padding:4px 8px;color:#888;">{sectorLabel(d.sector, lang)}</td>
+              <td style="padding:4px 8px;color:#555;font-variant-numeric:tabular-nums;">{d.empleo.toLocaleString(localeStr)}</td>
+              <td style="padding:4px 8px;color:#555;font-variant-numeric:tabular-nums;">{d.salario_medio_eur.toLocaleString(localeStr)} €</td>
+              <td style="padding:4px 8px;font-weight:600;color:#1a1a1a;">{formatScore(d.vulnerabilidad_ia_score)}</td>
+              <td style="padding:4px 8px;color:#888;">{displayEuAct(d)}</td>
+              <td style="padding:4px 8px;color:#888;">{displayTipo(d)}</td>
             </tr>
           );
         })}

@@ -5,6 +5,16 @@
  * Data source: precomputed from dataset v15 (spain_v15_threshold_lookup.csv).
  */
 
+import { strings, type Lang } from "@/i18n/static";
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = "es" } = Astro.props;
+const t = strings(lang);
+const localeStr = lang === "en" ? "en-US" : "es-ES";
+
 interface Row {
   threshold: number;
   occupations: number;
@@ -40,7 +50,8 @@ const colorFor = (s: number) => {
 };
 
 const maxPct = Math.max(...rows.map((r) => r.pct));
-const fmt = (n: number) => n.toLocaleString("es-ES");
+const fmt = (n: number) => n.toLocaleString(localeStr);
+const occShort = lang === "en" ? "occ." : "ocup.";
 ---
 
 <section id="seo-threshold-curve" style={`max-width:1200px;margin:2rem auto 0;padding:0 24px;font-family:${F};color:#1a1a1a;`}>
@@ -48,14 +59,14 @@ const fmt = (n: number) => n.toLocaleString("es-ES");
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:8px;">
       <div>
         <h2 style={`font-size:clamp(18px,2vw,24px);font-family:${S};font-weight:600;margin-bottom:4px;color:#1a1a1a;`}>
-          Cuántos trabajadores hay por encima de cada umbral
+          {t.threshold.heading}
         </h2>
         <p style="font-size:13px;color:#888;margin:0;">
-          Acumulado descendente desde score 9 a 2 · 22.732.223 trabajadores totales · Dataset v15
+          {t.threshold.subheading}
         </p>
       </div>
       <a href="/comparativa-funcas.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:11px;font-weight:600;background:#5a7048;color:#faf8f4;border-radius:5px;text-decoration:none;letter-spacing:0.3px;">
-        Ver comparativa Funcas →
+        {t.threshold.funcasLink}
       </a>
     </div>
 
@@ -85,7 +96,7 @@ const fmt = (n: number) => n.toLocaleString("es-ES");
             </div>
             <div style="font-size:12px;color:#666;text-align:right;">
               <span style="font-weight:600;color:#1a1a1a;">{fmt(r.workers)}</span>
-              <span style="color:#999;"> · {r.occupations} ocup.</span>
+              <span style="color:#999;"> · {r.occupations} {occShort}</span>
             </div>
           </div>
         );
@@ -93,9 +104,8 @@ const fmt = (n: number) => n.toLocaleString("es-ES");
     </div>
 
     <p style="font-size:12px;color:#888;margin-top:14px;line-height:1.5;font-style:italic;">
-      Lectura: el 11,73% de la fuerza laboral española se concentra en 41 ocupaciones con vulnerabilidad ≥7,5.
-      La cifra equivale en orden de magnitud a la destrucción central estimada por <a href="/comparativa-funcas.html" style="color:#5a7048;text-decoration:underline;">Funcas</a> (≈2M empleos en 10 años) sin asumir velocidad de adopción.
-      Datos brutos en <a href="/data/spain_v15_threshold_lookup.csv" style="color:#666;text-decoration:underline;">CSV</a>.
+      {t.threshold.reading}
+      {" "}{t.threshold.rawDataCsv} <a href="/data/spain_v15_threshold_lookup.csv" style="color:#666;text-decoration:underline;">CSV</a>.
     </p>
   </div>
 </section>

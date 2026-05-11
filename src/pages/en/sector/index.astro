@@ -1,12 +1,12 @@
 ---
-import Base from "../../layouts/Base.astro";
-import SectorIndexPage from "../../components/astro/SectorIndexPage.astro";
+import Base from "../../../layouts/Base.astro";
+import SectorIndexPage from "../../../components/astro/SectorIndexPage.astro";
 import { loadAllOccupations, getSectorStats, getAggregateStats, sectorSlugFor } from "@/data/loadOccupations";
 import { strings, sectorLabel } from "@/i18n/static";
 
-const lang = "es";
+const lang = "en";
 const t = strings(lang);
-const localeStr = "es-ES";
+const localeStr = "en-US";
 const { es } = loadAllOccupations();
 const sectors = getSectorStats(es);
 const stats = getAggregateStats(es);
@@ -32,6 +32,6 @@ const jsonLd = {
 };
 ---
 
-<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref="/en/sector/">
+<Base title={title} description={description} jsonLd={jsonLd} lang={lang} altLangHref="/sector/">
   <SectorIndexPage lang={lang} />
 </Base>

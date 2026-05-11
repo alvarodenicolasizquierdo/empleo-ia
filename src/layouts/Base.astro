@@ -1,5 +1,6 @@
 ---
 import { SITE } from "../config/site";
+import { LOCALES, type Lang } from "../i18n/static";
 
 interface Props {
   title: string;
@@ -8,18 +9,28 @@ interface Props {
   ogImage?: string;
   jsonLd?: object | object[];
   noindex?: boolean;
+  /** Active language for the rendered page. Defaults to "es" for backwards compat. */
+  lang?: Lang;
+  /** Path of the equivalent mirror page in the other language. Used for hreflang + og:locale:alternate. */
+  altLangHref?: string;
 }
 
-const { title, description, canonical, ogImage, jsonLd, noindex } = Astro.props;
+const { title, description, canonical, ogImage, jsonLd, noindex, lang = "es", altLangHref } = Astro.props;
 const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).href;
-const image = ogImage || new URL('/og-image.png', Astro.site).href;
-const siteName = "Vulnerabilidad Laboral a la IA · España 2026";
+const image = ogImage || new URL(lang === "en" ? "/og-image-en.png" : "/og-image.png", Astro.site).href;
+const locale = LOCALES[lang];
+const altLang: Lang = lang === "en" ? "es" : "en";
+const altLocale = LOCALES[altLang];
+const altHrefAbs = altLangHref ? new URL(altLangHref, Astro.site).href : undefined;
+const siteName = lang === "en"
+  ? "Labour Vulnerability to AI · Spain 2026"
+  : "Vulnerabilidad Laboral a la IA · España 2026";
 
 // Normalize jsonLd to array
 const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
-<html lang="es">
+<html lang={locale.htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,10 +53,14 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Language variants -->
-    <link rel="alternate" hreflang="es" href={`${Astro.site}?lang=es`} />
-    <link rel="alternate" hreflang="en" href={`${Astro.site}?lang=en`} />
-    <link rel="alternate" hreflang="x-default" href={Astro.site?.toString()} />
+    <!-- Language variants — real hreflang only when an alt mirror exists for this page. -->
+    <link rel="alternate" hreflang={locale.htmlLang} href={canonicalUrl} />
+    {altHrefAbs && (
+      <link rel="alternate" hreflang={altLocale.htmlLang} href={altHrefAbs} />
+    )}
+    {altHrefAbs && (
+      <link rel="alternate" hreflang="x-default" href={lang === "es" ? canonicalUrl : altHrefAbs} />
+    )}
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -58,8 +73,8 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:locale" content="es_ES" />
-    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale" content={locale.ogLocale} />
+    <meta property="og:locale:alternate" content={altLocale.ogLocale} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
@@ -73,7 +88,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="twitter:image" content={image} />
 
     <!-- Alternate data formats -->
-    <link rel="alternate" type="application/json" href="/data/spain_502_v15_subcomp_complete.json" />
+    <link rel="alternate" type="application/json" href={lang === "en" ? "/data/spain_502_v15_subcomp_complete_en.json" : "/data/spain_502_v15_subcomp_complete.json"} />
     <link rel="alternate" type="text/plain" href="/llms-full.txt" />
 
     <!-- Structured Data -->
@@ -88,6 +103,14 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Persist server-rendered language so the React island agrees on first paint,
+         and expose the alt-language mirror URL so LanguageToggle can navigate to it. -->
+    <script is:inline define:vars={{ pageLang: lang, altHref: altLangHref ?? null }}>
+      try { localStorage.setItem("lang", pageLang); } catch {}
+      window.__pageLang = pageLang;
+      window.__altLangHref = altHref;
+    </script>
 
     <slot name="head" />
   </head>
