@@ -6,7 +6,7 @@
 
 **502 ocupaciones** · **22,4 millones de empleos** · **12 sectores economicos**
 
-[**Ver Demo en Vivo**](https://empleo-ia.lovable.app) · [**Metodologia V20 (PDF)**](https://doi.org/10.5281/zenodo.19076797) · [**Abrir HTML standalone**](empleo-ia.html)
+[**Ver Demo en Vivo**](https://empleo-ia.lovable.app) · [**Metodologia v30 (PDF)**](https://doi.org/10.5281/zenodo.19076797) · [**Abrir HTML standalone**](empleo-ia.html)
 
 ---
 
@@ -73,12 +73,15 @@ Tabla completa con score, nombre, sector, empleados, salario y clasificacion EU 
 
 **Cada ocupacion incluye:**
 - Puntuacion de exposicion IA (0-10) con indicador de color
+- Sub-componentes D/C/F/R (Desplazamiento, Complejidad, Barrera fisica, Friccion regulatoria) alineados con la metodologia v3.0
 - Numero de empleados y salario medio
 - Clasificacion EU AI Act (Alto riesgo / Limitado / Minimo)
 - Tipo de impacto (Sustitucion / Hibrido / Aumentacion)
 - Vector de automatizacion (texto explicativo del mecanismo de exposicion)
 - Indice de masa salarial x exposicion
 - Botones de compartir (X, LinkedIn, WhatsApp, email, copiar)
+
+**Bilingue (ES/EN)** con react-i18next: cambia el idioma sin perder el estado (vista, filtro de sector, rango del slider, busqueda, ordenacion y panel abierto). Los valores internos del sector se mantienen en español canonico, asi que los deep-links (`?sector=...&min=...&max=...&q=...&sort=...&view=...&cno=...`) son estables entre idiomas.
 
 ---
 
@@ -182,13 +185,13 @@ npm run preview    # Preview del build
 </td>
 <td>
 
-**Validacion** — Re-puntuacion ciega de 100 ocupaciones estratificadas por GPT-4o. Resultados: **r = 0.715** · **ICC(2,1) = 0.701** · **kappa_w = 0.667** (acuerdo sustancial). MAD = 1.0 punto. 84% coinciden dentro de +/-2.0 puntos.
+**Validacion** — Dos experimentos independientes, no directamente comparables: **(i) Coherencia de sub-componentes** D/C/F/R frente al panel FUNCAS: **r = 0.953** (177 rescaladas) · **r = 0.802** (325 informativas). **(ii) Concordancia holistica** sobre la puntuacion agregada con GPT-4o: **kappa_w = 0.667** (Landis-Koch sustancial). Cobertura 100% (502/502).
 
 </td>
 </tr>
 </table>
 
-> Documento completo con 44 notas tecnicas: [**Metodologia V20 en Zenodo**](https://doi.org/10.5281/zenodo.19076797)
+> Documento completo con 57 notas tecnicas: [**Metodologia v30 en Zenodo**](https://doi.org/10.5281/zenodo.19076797)
 
 ---
 
@@ -289,13 +292,14 @@ empleo-ia/
 |   '-- ia-empleo-espana-metodologia-v20.pdf
 |
 |-- src/
-|   |-- pages/Index.tsx                    Dashboard principal (~860 lineas)
+|   |-- components/react/DashboardPage.tsx Dashboard principal (~1100 lineas, island React)
 |   |-- components/empleo/
 |   |   |-- Badge.tsx                      Indicador circular de score
-|   |   |-- DetailPanel.tsx                Panel lateral de detalle
+|   |   |-- LanguageToggle.tsx             Selector ES/EN con persistencia URL+localStorage
 |   |   '-- OccupationTooltip.tsx          Tooltip hover rico
+|   |-- i18n/                              Diccionarios ES/EN (react-i18next)
 |   '-- lib/
-|       |-- occupationData.ts              Tipos, constantes, helpers, parsers
+|       |-- occupationData.ts              Tipos, fmt locale-aware, sector canonical, parsers
 |       '-- treemap.ts                     Algoritmo squarified treemap
 |
 |-- docs/
@@ -315,7 +319,7 @@ empleo-ia/
 
 ---
 
-**Metodologia V20** · Validacion inter-modelo: kappa_w = 0.667
+**Metodologia v30** · Coherencia sub-componente: r = 0.953 / 0.802 · Concordancia holistica: kappa_w = 0.667
 
 (c) 2026 A. de Nicolas, M. Sureda
 
