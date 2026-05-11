@@ -29,7 +29,7 @@ export function OccupationTooltip({ item, mousePos }: TooltipProps) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 9, textTransform: "uppercase", color: "#a09b93", letterSpacing: "1px", marginBottom: 4 }}>
-            {item.isSectorGroup ? t("tooltip.sector") : `CNO ${item.cno} \u00B7 ${item.sector}`}
+            {item.isSectorGroup ? t("tooltip.sector") : `CNO ${item.cno} \u00B7 ${t(`sectors.${item.sector}`, item.sector)}`}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, fontFamily: S, lineHeight: 1.15, paddingRight: 8 }}>
             {item.name}

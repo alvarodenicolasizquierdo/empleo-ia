@@ -286,7 +286,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
 
         {/* Header */}
         <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "1.5px", color: "#999", marginBottom: 6 }}>
-          CNO {selected.cno} · {selected.sector.toUpperCase()}
+          CNO {selected.cno} · {t(`sectors.${selected.sector}`, selected.sector).toUpperCase()}
         </div>
         <h2 style={{
           fontSize: "clamp(24px, 3vw, 36px)", fontFamily: S, color: "#1a1a1a",
@@ -745,7 +745,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                       stroke={isH ? "#1a1a1a" : "#faf8f4"} strokeWidth={isH ? 4 : 2}
                       style={{ transition: "all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)" }} />
                     {/* Native browser tooltip as a fallback when the rect is too small to fit the label. */}
-                    <title>{r.name} — Score {fmtDecimal(r.score, 1)} / 10</title>
+                    <title>{r.isSectorGroup ? t(`sectors.${r.name}`, r.name) : r.name} — Score {fmtDecimal(r.score, 1)} / 10</title>
                     {show && (
                       <foreignObject x={(r.x || 0) + 6} y={(r.y || 0) + 6} width={(r.w || 0) - 12} height={(r.h || 0) - 12} style={{ pointerEvents: "none" }}>
                         <div style={{
@@ -758,7 +758,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                             fontWeight: r.isSectorGroup ? 700 : 600,
                             lineHeight: 1.1, marginBottom: 4, letterSpacing: r.isSectorGroup ? "-0.5px" : "0",
                           }}>
-                            {r.name}
+                            {r.isSectorGroup ? t(`sectors.${r.name}`, r.name) : r.name}
                           </div>
                           {(r.h || 0) > 65 && r.isSectorGroup ? (
                             <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: "auto" }}>
@@ -860,7 +860,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                               textShadow: "0 1px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5)",
                               opacity: isGroupHovered ? 0.3 : 1, transition: "opacity 0.2s ease"
                             }}>
-                            {group.name}
+                            {t(`sectors.${group.name}`, group.name)}
                           </text>
                         </>
                       )}
@@ -1026,7 +1026,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
                   <div style={{ fontWeight: 600, color: "#1a1a1a" }}>{item.name}</div>
                   <div style={{ fontSize: 10, color: "#bbb" }}>CNO {item.cno}</div>
                 </div>
-                <div style={{ fontSize: 11, color: "#999" }}>{item.sector}</div>
+                <div style={{ fontSize: 11, color: "#999" }}>{t(`sectors.${item.sector}`, item.sector)}</div>
                 <div style={{ textAlign: "right", color: "#555", fontVariantNumeric: "tabular-nums" }}>{fmt(item.empleo)}</div>
                 <div style={{ textAlign: "right", color: "#555", fontVariantNumeric: "tabular-nums" }}>{fmtE(item.salario)}</div>
                 <div style={{ textAlign: "right" }}>
