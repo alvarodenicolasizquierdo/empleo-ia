@@ -150,6 +150,7 @@ export const STATIC = {
       ocupacionPrefix: "/ocupacion",
       sectorPrefix: "/sector",
       root: "/",
+      funcasComparison: "/comparativa-funcas.html",
     },
   },
   en: {
@@ -284,6 +285,7 @@ export const STATIC = {
       ocupacionPrefix: "/en/occupation",
       sectorPrefix: "/en/sector",
       root: "/en/",
+      funcasComparison: "/en/funcas-comparison.html",
     },
   },
 } as const;

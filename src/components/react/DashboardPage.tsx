@@ -41,7 +41,8 @@ function writeStateToUrl(params: Record<string, string | number | null | undefin
 }
 
 function Dashboard({ data }: { data: Occupation[] }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const funcasHref = i18n.language === "en" ? "/en/funcas-comparison.html" : "/comparativa-funcas.html";
   const OCCUPATIONS_DATA = data;
   const SECTORS = useMemo(() => [...new Set(OCCUPATIONS_DATA.map(d => d.sector))].sort(), [OCCUPATIONS_DATA]);
   const initial = useMemo(() => readInitialState(), []);
@@ -509,7 +510,7 @@ function Dashboard({ data }: { data: Occupation[] }) {
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <a
-              href="/comparativa-funcas.html"
+              href={funcasHref}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "8px 14px", fontSize: 11, fontWeight: 700,
